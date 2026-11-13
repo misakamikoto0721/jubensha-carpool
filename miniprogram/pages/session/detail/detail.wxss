@@ -1,0 +1,92 @@
+.dock-page {
+  padding-bottom: 200rpx;
+}
+
+.meta-card {
+  margin-top: 28rpx;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: 24rpx;
+  padding: 10rpx 0;
+}
+
+.row .label {
+  margin: 0;
+}
+
+.section {
+  margin-top: 36rpx;
+}
+
+.section-title {
+  display: block;
+  margin-bottom: 12rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.member,
+.mark-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18rpx 0;
+  border-bottom: 1px solid #efe6d8;
+}
+
+.choices {
+  display: flex;
+  gap: 12rpx;
+}
+
+.choice {
+  height: 64rpx;
+  line-height: 64rpx;
+  padding: 0 22rpx;
+  border-radius: 999rpx;
+  border: 1px solid #e6dccb;
+  color: #6d645b;
+}
+
+.choice.on {
+  background: #241c16;
+  color: #f6f1e7;
+  border-color: #241c16;
+}
+
+.choice.on-bad {
+  background: #8f2d2a;
+  color: #fffdf8;
+  border-color: #8f2d2a;
+}
+
+.dock {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  gap: 16rpx;
+  align-items: center;
+  padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom));
+  background: rgba(243, 238, 228, 0.96);
+  border-top: 1px solid #e6dccb;
+}
+
+.dock .primary,
+.dock .ghost {
+  flex: 1;
+}
+
+.danger {
+  color: #8f2d2a;
+}
+
+.dock-note {
+  flex: 1;
+  color: #6d645b;
+  text-align: center;
+}

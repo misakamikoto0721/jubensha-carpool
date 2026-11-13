@@ -1,0 +1,62 @@
+<view class="page dock-page">
+  <view wx:if="{{loading}}" class="hint">正在加载</view>
+
+  <view wx:elif="{{missing || !session}}" class="empty">
+    <text class="title">没有这场车</text>
+    <button class="ghost block" bindtap="goHome">返回列表</button>
+  </view>
+
+  <block wx:else>
+    <text class="kicker">{{session.statusText}}</text>
+    <text class="title">{{session.scriptName}}</text>
+    <view class="card meta-card">
+      <view class="row"><text class="label">时间</text><text>{{session.timeText}}</text></view>
+      <view class="row"><text class="label">地点</text><text>{{session.location}}</text></view>
+      <view class="row"><text class="label">人数</text><text>{{session.seatText}}</text></view>
+      <view class="row" wx:if="{{session.dmName}}"><text class="label">DM</text><text>{{session.dmName}}</text></view>
+    </view>
+
+    <button class="ghost block" bindtap="copyLibrary">复制研讨室预约链接</button>
+
+    <view class="section">
+      <text class="section-title">车上的人</text>
+      <view wx:if="{{members.length === 0}}" class="hint">还没有人上车</view>
+      <view wx:for="{{members}}" wx:key="uid" class="member">
+        <text>{{item.name}}</text>
+        <text class="muted">{{item.statusText}}</text>
+      </view>
+    </view>
+
+    <view class="section card" wx:if="{{canMark && draft.length}}">
+      <text class="section-title">标记到场</text>
+      <text class="hint">活动结束后提交。未到的人选爽约。</text>
+      <view wx:for="{{draft}}" wx:key="uid" class="mark-row">
+        <text>{{item.name}}</text>
+        <view class="choices">
+          <button
+            class="choice {{item.status === 'attended' ? 'on' : ''}}"
+            data-uid="{{item.uid}}"
+            data-status="attended"
+            bindtap="pickMark"
+          >到场</button>
+          <button
+            class="choice {{item.status === 'no_show' ? 'on-bad' : ''}}"
+            data-uid="{{item.uid}}"
+            data-status="no_show"
+            bindtap="pickMark"
+          >爽约</button>
+        </view>
+      </view>
+      <button class="primary block" bindtap="submitMarks">提交到场记录</button>
+    </view>
+    <view class="hint" wx:elif="{{canMark}}">还没有人上车，暂时不用标记。</view>
+  </block>
+
+  <view class="dock" wx:if="{{session}}">
+    <button class="ghost" open-type="share">分享到群</button>
+    <button wx:if="{{needBind}}" class="primary" bindtap="goLogin">绑定学号</button>
+    <button wx:elif="{{canJoin}}" class="primary" bindtap="join">上车</button>
+    <button wx:elif="{{canCancel}}" class="ghost danger" bindtap="cancelJoin">取消上车</button>
+    <view wx:else class="dock-note">{{joinBlockReason}}</view>
+  </view>
+</view>

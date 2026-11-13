@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>剧本杀拼车</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #f3eee4;
+      color: #241c16;
+    }
+    main {
+      max-width: 28rem;
+      margin: 0 auto;
+      padding: 3rem 1.5rem;
+    }
+    p { line-height: 1.6; }
+    .id { color: #8f2d2a; }
+  </style>
+</head>
+<body>
+  <main>
+    <p>这是社团剧本杀拼车的入口页。</p>
+    <p>请回到 QQ 或微信，打开对应的小程序卡片。这个页面只用来满足 QQ 分享对链接的要求。</p>
+    <p class="id" id="sid"></p>
+  </main>
+  <script>
+    var id = new URLSearchParams(location.search).get('id') || ''
+    if (id) document.getElementById('sid').textContent = '车次编号：' + id
+  </script>
+</body>
+</html>

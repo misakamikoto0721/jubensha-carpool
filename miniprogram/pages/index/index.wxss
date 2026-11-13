@@ -1,0 +1,102 @@
+.hero {
+  margin-bottom: 12rpx;
+}
+
+.me {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 28rpx;
+}
+
+.text-btn {
+  height: auto;
+  padding: 0;
+  line-height: 1.5;
+  color: #8f2d2a;
+}
+
+.list {
+  margin-top: 28rpx;
+}
+
+.session {
+  margin-bottom: 20rpx;
+}
+
+.session-hover {
+  background: #f7f1e6;
+}
+
+.session-top,
+.session-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.script {
+  font-size: 34rpx;
+  font-weight: 600;
+}
+
+.meta {
+  display: block;
+  margin-top: 8rpx;
+  color: #6d645b;
+}
+
+.session-bottom {
+  margin-top: 18rpx;
+}
+
+.pill {
+  flex-shrink: 0;
+  padding: 4rpx 14rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  line-height: 1.6;
+}
+
+.pill-open {
+  background: #e5efe8;
+  color: #3f5c4b;
+}
+
+.pill-full,
+.pill-pending {
+  background: #f6e4dc;
+  color: #8f2d2a;
+}
+
+.pill-completed,
+.pill-closed {
+  background: #eee7dc;
+  color: #6d645b;
+}
+
+.empty {
+  margin-top: 28rpx;
+}
+
+.empty-title {
+  display: block;
+  font-size: 32rpx;
+}
+
+.empty-sub {
+  display: block;
+  margin-top: 8rpx;
+  color: #6d645b;
+}
+
+.admin {
+  margin-top: 36rpx;
+}
+
+.admin-title {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 600;
+}

@@ -1,0 +1,25 @@
+.time-row {
+  display: flex;
+  gap: 16rpx;
+}
+
+.time-row picker {
+  flex: 1;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.step {
+  width: 88rpx;
+  padding: 0;
+}
+
+.count {
+  min-width: 48rpx;
+  font-size: 40rpx;
+  text-align: center;
+}

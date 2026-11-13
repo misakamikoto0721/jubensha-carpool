@@ -1,0 +1,60 @@
+<view class="page">
+  <view class="hero">
+    <text class="kicker">社团内部</text>
+    <text class="title">正在报名的车</text>
+    <view class="me" wx:if="{{user}}">
+      <text>{{user.name}} · {{user.roleText}}</text>
+      <text class="muted">爽约 {{user.noShowCount}} 次</text>
+    </view>
+    <view class="me" wx:else>
+      <text>还没有绑定学号</text>
+      <button class="text-btn" bindtap="goLogin">去绑定</button>
+    </view>
+    <view class="ban" wx:if="{{user && user.banText}}">{{user.banText}}</view>
+  </view>
+
+  <button wx:if="{{canCreate}}" class="primary block" bindtap="goCreate">发布车次</button>
+
+  <view wx:if="{{loading}}" class="hint">正在加载</view>
+  <view wx:elif="{{sessions.length === 0}}" class="empty card">
+    <text class="empty-title">还没有开放的车次</text>
+    <text class="empty-sub">DM 发布后会出现在这里，也可以从 QQ 群的卡片直接进来。</text>
+  </view>
+  <view wx:else class="list">
+    <view
+      class="card session"
+      wx:for="{{sessions}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      hover-class="session-hover"
+      bindtap="openDetail"
+    >
+      <view class="session-top">
+        <text class="script">{{item.scriptName}}</text>
+        <text class="pill pill-{{item.pendingMark ? 'pending' : item.status}}">{{item.statusText}}</text>
+      </view>
+      <text class="meta">{{item.timeText}}</text>
+      <text class="meta">{{item.location}}</text>
+      <view class="session-bottom">
+        <text>{{item.seatText}} 人</text>
+        <text class="muted" wx:if="{{item.dmName}}">DM {{item.dmName}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="card admin" wx:if="{{user && user.role === 'admin'}}">
+    <text class="admin-title">设置成员身份</text>
+    <text class="hint">DM 才能发布车次。对方需要先在小程序里绑定过学号。</text>
+    <view class="field">
+      <text class="label">学号</text>
+      <input class="input" placeholder="例如 PB220001" value="{{roleStudentId}}" bindinput="onRoleStudentId" />
+    </view>
+    <view class="field">
+      <text class="label">身份</text>
+      <picker mode="selector" range="{{roleLabels}}" value="{{roleIndex}}" bindchange="onRolePick">
+        <view class="input picker">{{roleLabels[roleIndex]}}</view>
+      </picker>
+    </view>
+    <button class="ghost block" bindtap="submitRole">保存身份</button>
+  </view>
+</view>

@@ -1,0 +1,35 @@
+<view class="page">
+  <text class="kicker">DM</text>
+  <text class="title">发布一场车</text>
+
+  <view class="field">
+    <text class="label">剧本名</text>
+    <input class="input" placeholder="今天开哪本" value="{{scriptName}}" bindinput="onScriptName" />
+  </view>
+  <view class="field">
+    <text class="label">开始时间</text>
+    <view class="time-row">
+      <picker mode="date" value="{{date}}" bindchange="onDate">
+        <view class="input picker">{{date}}</view>
+      </picker>
+      <picker mode="time" value="{{time}}" bindchange="onTime">
+        <view class="input picker">{{time}}</view>
+      </picker>
+    </view>
+  </view>
+  <view class="field">
+    <text class="label">地点</text>
+    <input class="input" placeholder="西图研讨室 / 活动室" value="{{location}}" bindinput="onLocation" />
+  </view>
+  <view class="field">
+    <text class="label">人数上限</text>
+    <view class="stepper">
+      <button class="ghost step" data-step="-1" bindtap="changeCapacity">-</button>
+      <text class="count">{{capacity}}</text>
+      <button class="ghost step" data-step="1" bindtap="changeCapacity">+</button>
+    </view>
+  </view>
+
+  <button class="primary block" bindtap="submit">发布</button>
+  <text class="hint">发布后可以分享到 QQ 群。研讨室预约仍走图书馆网站，车次页里有复制链接。</text>
+</view>

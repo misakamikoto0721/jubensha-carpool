@@ -1,0 +1,5 @@
+<view class="page" wx:if="{{blocked}}">
+  <text class="title">无法打开登录页</text>
+  <text class="hint">只接受科大统一身份认证的授权地址。</text>
+</view>
+<web-view wx:else src="{{url}}"></web-view>

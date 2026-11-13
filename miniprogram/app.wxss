@@ -1,0 +1,115 @@
+page {
+  background: #f3eee4;
+  color: #241c16;
+  font-size: 30rpx;
+  line-height: 1.5;
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+}
+
+.page {
+  min-height: 100vh;
+  padding: 32rpx 32rpx 48rpx;
+  box-sizing: border-box;
+}
+
+.kicker {
+  display: block;
+  color: #8f2d2a;
+  font-size: 22rpx;
+  letter-spacing: 6rpx;
+}
+
+.title {
+  display: block;
+  margin-top: 8rpx;
+  font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
+  font-size: 52rpx;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.muted {
+  color: #6d645b;
+}
+
+.ban {
+  margin-top: 20rpx;
+  padding: 16rpx 20rpx;
+  background: #f6e4dc;
+  color: #8f2d2a;
+  border-radius: 12rpx;
+}
+
+.card {
+  background: #fffdf8;
+  border: 1px solid #e6dccb;
+  border-radius: 18rpx;
+  padding: 28rpx;
+}
+
+.field {
+  margin-top: 28rpx;
+}
+
+.label {
+  display: block;
+  margin-bottom: 12rpx;
+  color: #6d645b;
+  font-size: 24rpx;
+}
+
+.input,
+.picker {
+  height: 88rpx;
+  padding: 0 24rpx;
+  background: #fffdf8;
+  border: 1px solid #e6dccb;
+  border-radius: 12rpx;
+  box-sizing: border-box;
+  font-size: 30rpx;
+}
+
+.picker {
+  line-height: 88rpx;
+}
+
+button {
+  margin: 0;
+  padding: 0 24rpx;
+  background: transparent;
+  line-height: 88rpx;
+  font-size: 30rpx;
+}
+
+button::after {
+  border: none;
+}
+
+.primary,
+.ghost {
+  height: 88rpx;
+  border-radius: 12rpx;
+  text-align: center;
+}
+
+.primary {
+  background: #8f2d2a;
+  color: #fffdf8;
+}
+
+.ghost {
+  background: #fffdf8;
+  color: #241c16;
+  border: 1px solid #cfc3b0;
+}
+
+.block {
+  width: 100%;
+  margin-top: 36rpx;
+}
+
+.hint {
+  margin-top: 24rpx;
+  color: #6d645b;
+  font-size: 26rpx;
+}

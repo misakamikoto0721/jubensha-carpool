@@ -1,0 +1,18 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/login/login",
+    "pages/auth/webview",
+    "pages/session/create/create",
+    "pages/session/detail/detail"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#241c16",
+    "navigationBarTitleText": "剧本杀拼车",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f3eee4",
+    "backgroundTextStyle": "dark"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}
