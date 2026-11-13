@@ -26,11 +26,29 @@
       "ignore": [],
       "disablePlugins": [],
       "outputPath": ""
-    }
+    },
+    "compileWorklet": false,
+    "packNpmManually": false,
+    "packNpmRelationList": [],
+    "localPlugins": false,
+    "disableUseStrict": false,
+    "useCompilerPlugins": false,
+    "condition": false
   },
-  "appid": "touristappid",
+  "appid": "wxaa81dbfad68e2993",
   "projectname": "剧本杀拼车",
   "libVersion": "3.5.5",
   "compileType": "miniprogram",
-  "condition": {}
+  "condition": {},
+  "simulatorPluginLibVersion": {},
+  "packOptions": {
+    "ignore": [],
+    "include": [
+      {
+        "type": "folder",
+        "value": "assets/tab"
+      }
+    ]
+  },
+  "editorSetting": {}
 }

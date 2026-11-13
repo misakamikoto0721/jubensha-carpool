@@ -1,16 +1,45 @@
 {
   "pages": [
-    "pages/index/index",
     "pages/login/login",
+    "pages/index/index",
+    "pages/scripts/scripts",
+    "pages/me/me",
     "pages/auth/webview",
     "pages/session/create/create",
     "pages/session/detail/detail"
   ],
+  "tabBar": {
+    "color": "#9aa3b2",
+    "selectedColor": "#1a56b0",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "position": "bottom",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "主页",
+        "iconPath": "assets/tab/home.png",
+        "selectedIconPath": "assets/tab/home-on.png"
+      },
+      {
+        "pagePath": "pages/scripts/scripts",
+        "text": "剧本",
+        "iconPath": "assets/tab/script.png",
+        "selectedIconPath": "assets/tab/script-on.png"
+      },
+      {
+        "pagePath": "pages/me/me",
+        "text": "我的",
+        "iconPath": "assets/tab/me.png",
+        "selectedIconPath": "assets/tab/me-on.png"
+      }
+    ]
+  },
   "window": {
-    "navigationBarBackgroundColor": "#241c16",
+    "navigationBarBackgroundColor": "#1a56b0",
     "navigationBarTitleText": "剧本杀拼车",
     "navigationBarTextStyle": "white",
-    "backgroundColor": "#f3eee4",
+    "backgroundColor": "#f5f6f8",
     "backgroundTextStyle": "dark"
   },
   "style": "v2",

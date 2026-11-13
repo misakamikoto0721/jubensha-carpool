@@ -1,36 +1,7 @@
-<view class="page">
-  <text class="kicker">身份</text>
-  <text class="title">登录</text>
-  <text class="hint lead" wx:if="{{ustcConfigured}}">可以用科大账号登录。学号绑定仍然可用，爽约记录记在学工号上。</text>
-  <text class="hint lead" wx:else>统一认证凭据还没配到云函数。现在先用学号绑定，爽约记录记在学号上。</text>
-
-  <view class="card bound" wx:if="{{boundUser}}">
-    <text>当前已绑定 {{boundUser.name}}（{{boundUser.studentId}}）</text>
-    <text class="hint">再次提交可以改正姓名。已经有报名或爽约记录后，不能自行换成另一个学号。</text>
-  </view>
-
-  <view class="card oauth" wx:if="{{ustcConfigured}}">
-    <text class="oauth-title">科大统一身份认证</text>
-    <button class="primary block" bindtap="openUstc">使用科大账号登录</button>
-    <text class="hint">登录链接会复制出来。完成后把回调页上的 code 和 state 填在下面。若小程序允许打开网页，也会直接进入认证页。</text>
-    <view class="field">
-      <text class="label">code</text>
-      <input class="input" value="{{oauthCode}}" bindinput="onOAuthCode" />
-    </view>
-    <view class="field">
-      <text class="label">state</text>
-      <input class="input" value="{{oauthState}}" bindinput="onOAuthState" />
-    </view>
-    <button class="ghost block" bindtap="finishUstc">完成科大登录</button>
-  </view>
-
-  <view class="field">
-    <text class="label">学号</text>
-    <input class="input" placeholder="字母或数字" value="{{studentId}}" bindinput="onStudentId" />
-  </view>
-  <view class="field">
-    <text class="label">姓名</text>
-    <input class="input" placeholder="社团里怎么称呼你" value="{{name}}" bindinput="onName" />
-  </view>
-  <button class="primary block" bindtap="submit">用学号绑定</button>
+<view class="gate">
+  <view class="gate-mark">科大</view>
+  <text class="gate-school">中国科学技术大学</text>
+  <text class="gate-app">剧本杀拼车</text>
+  <button class="enter" bindtap="openUstc">统一身份认证登录</button>
+  <button wx:if="{{devLogin}}" class="temp" bindtap="useDevAccount">临时登录</button>
 </view>

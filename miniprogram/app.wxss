@@ -1,6 +1,6 @@
 page {
-  background: #f3eee4;
-  color: #241c16;
+  background: #f5f6f8;
+  color: #1c2430;
   font-size: 30rpx;
   line-height: 1.5;
   font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
@@ -14,22 +14,21 @@ page {
 
 .kicker {
   display: block;
-  color: #8f2d2a;
+  color: #1a56b0;
   font-size: 22rpx;
-  letter-spacing: 6rpx;
+  letter-spacing: 4rpx;
 }
 
 .title {
   display: block;
   margin-top: 8rpx;
-  font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
-  font-size: 52rpx;
+  font-size: 40rpx;
   font-weight: 600;
-  line-height: 1.25;
+  line-height: 1.3;
 }
 
 .muted {
-  color: #6d645b;
+  color: #8a94a6;
 }
 
 .ban {
@@ -41,10 +40,10 @@ page {
 }
 
 .card {
-  background: #fffdf8;
-  border: 1px solid #e6dccb;
-  border-radius: 18rpx;
+  background: #ffffff;
+  border-radius: 24rpx;
   padding: 28rpx;
+  box-shadow: 0 12rpx 36rpx rgba(36, 28, 22, 0.06);
 }
 
 .field {
@@ -62,7 +61,7 @@ page {
 .picker {
   height: 88rpx;
   padding: 0 24rpx;
-  background: #fffdf8;
+  background: #ffffff;
   border: 1px solid #e6dccb;
   border-radius: 12rpx;
   box-sizing: border-box;
@@ -93,14 +92,23 @@ button::after {
 }
 
 .primary {
-  background: #8f2d2a;
-  color: #fffdf8;
+  background: #1a56b0;
+  color: #ffffff;
 }
 
 .ghost {
-  background: #fffdf8;
-  color: #241c16;
-  border: 1px solid #cfc3b0;
+  background: #ffffff;
+  color: #1c2430;
+  border: 1px solid #d5dbe3;
+}
+
+.slim {
+  flex-shrink: 0;
+  height: 64rpx;
+  margin-top: 8rpx;
+  padding: 0 28rpx;
+  line-height: 64rpx;
+  border-radius: 999rpx;
 }
 
 .block {

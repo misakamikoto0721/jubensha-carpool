@@ -124,10 +124,16 @@ function canManageSession(user, session) {
   return user.role === 'dm' && user.uid === session.dm_uid
 }
 
-function resolveRole(flags) {
-  const options = flags || {}
-  if (options.listedAdmin || options.carryAdmin || options.isFirst) return 'admin'
-  return 'player'
+function decideRoleChange(actor, target, role) {
+  if (!actor || actor.role !== 'admin') {
+    return fail('forbidden', '只有管理员可以把别人加入 DM')
+  }
+  if (!target) return fail('missing_user', '这个学号还没有绑定过小程序')
+  if (target.role === 'admin') return fail('forbidden', '不能改管理员的身份')
+  if (role !== 'dm' && role !== 'player') {
+    return fail('invalid_role', '只能加入或移出 DM')
+  }
+  return { ok: true, role: role }
 }
 
 function signupDocId(sessionId, uid) {
@@ -156,7 +162,7 @@ module.exports = {
   applyNoShow: applyNoShow,
   canCreate: canCreate,
   canManageSession: canManageSession,
-  resolveRole: resolveRole,
+  decideRoleChange: decideRoleChange,
   signupDocId: signupDocId,
   sameMembers: sameMembers
 }

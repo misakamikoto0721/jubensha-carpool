@@ -1,0 +1,31 @@
+<view class="page">
+  <text class="kicker">本子</text>
+  <text class="title">剧本</text>
+  <text class="hint lead">正在报名的车，按剧本放在一起。</text>
+
+  <view wx:if="{{loading}}" class="hint">正在加载</view>
+  <view wx:elif="{{scripts.length === 0}}" class="empty">
+    <text class="empty-title">还没有在拼的剧本</text>
+    <text class="empty-sub">有人发车之后，会出现在这里。</text>
+  </view>
+  <view wx:else class="list">
+    <view class="card script" wx:for="{{scripts}}" wx:key="name">
+      <view class="script-top">
+        <text class="script-name">{{item.name}}</text>
+        <text class="muted">{{item.countText}}</text>
+      </view>
+      <view
+        class="run"
+        wx:for="{{item.sessions}}"
+        wx:for-item="run"
+        wx:key="id"
+        data-id="{{run.id}}"
+        hover-class="run-hover"
+        bindtap="openDetail"
+      >
+        <text class="run-time">{{run.timeText}}</text>
+        <text class="run-meta">{{run.location}} · {{run.remainText}}</text>
+      </view>
+    </view>
+  </view>
+</view>

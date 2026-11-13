@@ -7,6 +7,7 @@ Page({
     name: '',
     boundUser: null,
     ustcConfigured: false,
+    devLogin: false,
     oauthCode: '',
     oauthState: ''
   },
@@ -26,17 +27,20 @@ Page({
   },
 
   onShow() {
-    session.loadMe().then((me) => {
-      this.setData({
-        boundUser: me.user,
-        ustcConfigured: !!(me.auth && me.auth.configured)
-      })
-    }).catch(() => {})
     if (this.pendingOAuth) {
       const pending = this.pendingOAuth
       this.pendingOAuth = null
       this.finishWith(pending.code, pending.state)
+      return
     }
+    session.loadMe().then((me) => {
+      this.setData({
+        boundUser: me.user,
+        ustcConfigured: !!(me.auth && me.auth.configured),
+        devLogin: !!me.devLogin
+      })
+      if (me.user) this.leave()
+    }).catch(() => {})
   },
 
   onStudentId(event) {
@@ -86,6 +90,12 @@ Page({
     })).then((result) => this.afterBind(result)).catch(() => {})
   },
 
+  useDevAccount() {
+    api.withLoading(() => api.call('devLogin', { provider: api.provider() }))
+      .then((result) => this.afterBind(result))
+      .catch(() => {})
+  },
+
   submit() {
     api.withLoading(() => api.call('bindUid', {
       studentId: this.data.studentId,
@@ -96,9 +106,7 @@ Page({
 
   afterBind(result) {
     getApp().globalData.user = result.user
-    const title = result.becameAdmin ? '你已成为管理员' : '绑定成功'
-    wx.showToast({ title: title, icon: 'success' })
-    setTimeout(() => this.leave(), 400)
+    this.leave()
   },
 
   leave() {
@@ -106,10 +114,6 @@ Page({
       wx.redirectTo({ url: this.redirect })
       return
     }
-    wx.navigateBack({
-      fail: () => {
-        wx.redirectTo({ url: '/pages/index/index' })
-      }
-    })
+    wx.switchTab({ url: '/pages/index/index' })
   }
 })

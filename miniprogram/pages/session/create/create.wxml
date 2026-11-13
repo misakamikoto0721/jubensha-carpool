@@ -1,7 +1,8 @@
 <view class="page">
   <text class="kicker">DM</text>
-  <text class="title">发布一场车</text>
+  <text class="title">发车</text>
 
+  <view class="card form">
   <view class="field">
     <text class="label">剧本名</text>
     <input class="input" placeholder="今天开哪本" value="{{scriptName}}" bindinput="onScriptName" />
@@ -29,7 +30,7 @@
       <button class="ghost step" data-step="1" bindtap="changeCapacity">+</button>
     </view>
   </view>
+  </view>
 
-  <button class="primary block" bindtap="submit">发布</button>
-  <text class="hint">发布后可以分享到 QQ 群。研讨室预约仍走图书馆网站，车次页里有复制链接。</text>
+  <button class="primary block" bindtap="submit">发出这场车</button>
 </view>

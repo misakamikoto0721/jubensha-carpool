@@ -1,19 +1,13 @@
-.hero {
-  margin-bottom: 12rpx;
-}
-
-.me {
+.head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  margin-top: 28rpx;
+  gap: 24rpx;
 }
 
-.text-btn {
-  height: auto;
-  padding: 0;
-  line-height: 1.5;
-  color: #8f2d2a;
+.head-copy {
+  flex: 1;
+  min-width: 0;
 }
 
 .list {
@@ -37,18 +31,31 @@
 }
 
 .script {
-  font-size: 34rpx;
+  font-size: 36rpx;
   font-weight: 600;
+  line-height: 1.3;
 }
 
 .meta {
   display: block;
   margin-top: 8rpx;
   color: #6d645b;
+  font-size: 26rpx;
 }
 
 .session-bottom {
-  margin-top: 18rpx;
+  margin-top: 20rpx;
+  padding-top: 16rpx;
+  border-top: 1px solid #efe6d8;
+}
+
+.remain {
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.remain.hot {
+  color: #1a56b0;
 }
 
 .pill {
@@ -77,26 +84,17 @@
 }
 
 .empty {
-  margin-top: 28rpx;
+  margin-top: 48rpx;
 }
 
 .empty-title {
   display: block;
-  font-size: 32rpx;
+  font-size: 34rpx;
+  font-weight: 600;
 }
 
 .empty-sub {
   display: block;
   margin-top: 8rpx;
   color: #6d645b;
-}
-
-.admin {
-  margin-top: 36rpx;
-}
-
-.admin-title {
-  display: block;
-  font-size: 32rpx;
-  font-weight: 600;
 }

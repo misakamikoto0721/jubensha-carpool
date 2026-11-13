@@ -1,48 +1,79 @@
 # 剧本杀拼车
 
-社团内部用的微信小程序。DM 发车，分享到 QQ 群，成员上车，活动结束后标记到场或爽约。累计 2 次爽约会禁止报名 14 天。
+科大社团内部的微信小程序。DM 发车，分享到群里，成员上车，活动结束后标记到场或爽约。累计 2 次爽约，禁止报名 14 天。
 
-后端是一个微信云函数 `api`，前端不直接读写数据库。统一身份认证还没开通时，成员用学号绑定；惩罚记在学号上。
+身份来自科大统一身份认证。登录成功后，学工号写入云端用户记录。小程序不让用户自己填学号来注册。
 
-## 本地跑起来
+当前阶段：统一认证的页面和接口已经留好，学校的 `client_id` / `client_secret` 还没下来，所以登录按钮会提示尚未配置。产品页面按「登录页 → 三个分页」来用，不要再改回手填学号的主流程。
 
-1. 安装微信开发者工具，用管理员微信登录。
-2. 导入本目录。把 `project.config.json` 里的 `appid` 从 `touristappid` 换成小程序后台的 AppID。
-3. 开通云开发，创建一个环境。如果开发者工具没有自动选中它，把环境 ID 填进 `miniprogram/config.js` 的 `envId`。
-4. 在 `cloudfunctions/api` 上右键，选择「上传并部署：云端安装依赖」。
-5. 编译。第一位绑定学号的人会成为管理员。管理员在首页把 DM 的学号设成 DM，DM 才能发车。
+后续 Agent 在审核代码或继续开发之前，必须先读 [Agent.md](Agent.md) 并遵守。
 
-数据库集合会在第一次写入时自动创建：`users`、`auth_identities`、`sessions`、`signups`。云开发控制台里把这四个集合的权限设成「所有用户不可读写」。云函数使用管理端权限，不受这条限制。
+## 现在的页面
 
-## 目录
+打开小程序先进 `pages/login/login`。正式按钮是「统一身份认证登录」，去接科大官方登录页，那个页面不由本项目绘制。统一认证接通前，同一页有「临时登录」，用 `devUser.js` 里的账号进入三个底栏。接通后删掉它。已经登录过的微信会直接进入底栏。
 
-- `miniprogram/`：页面。列表、绑定学号、发布车次、车次详情。
-- `cloudfunctions/api/`：全部后端。`action` 为 `login`、`authStart`、`authFinish`、`bindUid`、`createSession`、`joinSession`、`cancelJoin`、`markAttendance`、`getSession`、`listSessions`、`setRole`。
-- `auth-callback/index.html`：统一认证的回调页。部署后的完整地址填进云函数环境变量 `USTC_REDIRECT_URI`，必须和学校登记的回调地址一致。
-- `qq-entry/index.html`：给 QQ 分享用的静态页。部署到 `ustc.edu.cn` 或社团可控的 HTTPS 域名后，把地址填进 `miniprogram/config.js` 的 `shareHrefBase`，不要带问号。
-- `test/domain.test.js`：爽约、满员、权限这些纯规则。运行 `node --test test/domain.test.js`。
+| 底栏 | 路径 | 作用 |
+|---|---|---|
+| 主页 | `pages/index/index` | 正在报名的车。DM 或管理员可以发车 |
+| 剧本 | `pages/scripts/scripts` | 把这些车按剧本名归在一起 |
+| 我的 | `pages/me/me` | 姓名、学号、身份、爽约次数。管理员可把别人加入 DM。登出回到登录页 |
 
-## 规则
+发车 `pages/session/create/create` 和车次详情 `pages/session/detail/detail` 从底栏里打开，不占底栏。研讨室不在小程序里预约，详情页复制 `http://ic.lib.ustc.edu.cn/`。
 
-- 上车、取消、满员和爽约计数都在云函数事务里完成，前端改不了结果。
-- 开始时间到了就不能再上车。取消上车在标记到场之前都可以。
-- 标记提交后车次关闭，不能在小程序里改。
-- 研讨室不在小程序里预约。详情页复制 `http://ic.lib.ustc.edu.cn/` ，到浏览器打开。
-- 学号绑定没有密码。知道别人学号的人可以抢先绑定，这只是统一认证开通前的临时办法。已经有报名或爽约记录后，不能自行换成另一个学号。
+## 账号存在哪
 
-统一认证的接口已经留好，凭据到了之后不用改调用方式。在云函数 `api` 的环境变量里设置 `USTC_CLIENT_ID`、`USTC_CLIENT_SECRET`、`USTC_REDIRECT_URI`，然后重新部署。不要把 secret 写进代码。
+每次云函数调用都带当前微信的 openid。
 
-- `login`：看当前微信是否已经绑定，并告诉前端统一认证是否已配置。
-- `authStart`：生成一次性 `state`，返回科大授权地址。未配置时只返回 `configured: false`，不访问学校接口。
-- `authFinish`：校验 `state` 属于当前微信且未过期，用 `code` 换令牌和身份，再把 openid 绑到学工号上。`gid` 另外保存。
-- `bindUid`：学号绑定，统一认证未开通时继续用它。
+- `auth_identities`：`openid → uid`。登出只删这条连接。
+- `users`：一个人一条。`uid`、`student_id`、`name`、`role`（`player` / `dm` / `admin`）、`credit_status`、`ban_until`、`no_show_count`。
+- `sessions`：一场车。`dm_uid`、`script_name`、`start_time`、`location`、`capacity`、`status`、`joined_count`、`member_uids`。
+- `signups`：报名。文档 id 是 `车次 id_uid`。
+- `oauth_states`：统一认证的一次性 state，10 分钟，用完即删。
 
-回调页会尽量跳回小程序登录页。没有自动跳回时，把页面上的 code 和 state 填进登录页。
+`role` 写在每个用户自己的文档上。管理员用 `setRole` 把别人的 `role` 改成 `dm` 或 `player`。小程序里不能把别人设成管理员。第一位登录的人不会自动成为管理员。
 
-## 验收
+## 接口
 
-1. 管理员把某个学号设为 DM。
-2. DM 发布一场车，分享卡片能打开详情。
-3. 另一位已绑定成员上车，人数加一；满员后其他人上不了。
-4. DM 把其中一人标成爽约，再标一次，这个人在 14 天内上车按钮不可用，并看得到解禁时间。
-5. 换一个微信绑定同一个学号，限制仍然在。
+只有一个云函数 `api`。调用：
+
+```text
+wx.cloud.callFunction({ name: 'api', data: { action, ... } })
+```
+
+成功是 `{ ok: true, ... }`。失败是 `{ ok: false, reason, message }`。前端不直接读写数据库。
+
+| action | 作用 |
+|---|---|
+| `login` | 用 openid 读当前用户。返回 `bound`、`user`、`auth.configured` |
+| `authStart` | 未配置时返回 `configured: false`。已配置时返回科大授权地址和 `state` |
+| `authFinish` | 校验 `code` + `state`，向科大换身份，写入 `users` 和 `auth_identities` |
+| `logout` | 删除当前 openid 的连接。用户记录和爽约保留 |
+| `listSessions` | 报名中和已满的车 |
+| `getSession` | 一场车的详情、名单、当前用户能否上车 |
+| `createSession` | DM 或管理员发车 |
+| `joinSession` | 上车 |
+| `cancelJoin` | 标记到场前取消上车 |
+| `markAttendance` | 本场 DM 或管理员，把车上每个人标成到场或爽约 |
+| `setRole` | 仅管理员。`role` 只能是 `dm` 或 `player` |
+
+临时入口：`bindUid`（自己填学号，登录页不展示）、`devLogin`（登录页「临时登录」，读 `cloudfunctions/api/devUser.js`）。统一认证接通后删掉这两个 action、`devUser.js`、登录页上的临时按钮和对应测试。对外预览前把 `devUser.js` 的 `enabled` 改成 `false`。
+
+统一认证环境变量只放在云函数上，不写进仓库：`USTC_CLIENT_ID`、`USTC_CLIENT_SECRET`、`USTC_REDIRECT_URI`。三个都有时才访问学校接口。
+
+## 本地
+
+1. 用微信开发者工具导入本目录。AppID 在 `project.config.json`。
+2. 云环境 ID 在 `miniprogram/config.js` 的 `envId`，当前是 `dev-d4gncw2d79d2ea51f`。
+3. 改页面后，在开发者工具里编译一次。没有单独的前端构建命令。
+4. 改 `cloudfunctions/api` 后，要重新上传并部署云函数，模拟器才会调到新代码。
+5. 数据库四个业务集合权限设为「所有用户不可读写」。云函数用管理端权限写入。
+
+规则测试：
+
+```text
+node --test test/domain.test.js test/ustcAuth.test.js test/devUser.test.js
+```
+
+## 范围之外
+
+不做支付、抽签、候补、剧本库、角色槽、评分、订阅消息，也不做另一套 QQ 小程序。微信小程序在 QQ 里打开即可。研讨室是外链，不是接口。

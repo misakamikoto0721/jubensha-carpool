@@ -11,6 +11,7 @@ module.exports = async function joinSession(event, cloud) {
   const loaded = await users.requireUser(db, cloud, now)
   if (!loaded.ok) return loaded
   if (!loaded.user) return { ok: false, reason: 'unbound', message: '绑定学号后才能上车' }
+  await users.ensureCollection(db, 'signups')
 
   try {
     return await db.runTransaction(async (transaction) => {

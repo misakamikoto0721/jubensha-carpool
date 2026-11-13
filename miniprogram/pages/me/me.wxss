@@ -1,0 +1,120 @@
+.me {
+  min-height: 100vh;
+  background: #f5f6f8;
+}
+
+.hero {
+  padding: 28rpx 36rpx 108rpx;
+  background: #1a56b0;
+}
+
+.who {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.avatar {
+  flex-shrink: 0;
+  width: 112rpx;
+  height: 112rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  font-size: 44rpx;
+  font-weight: 600;
+  line-height: 112rpx;
+  text-align: center;
+}
+
+.who-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.who-line {
+  display: block;
+  color: #ffffff;
+  font-size: 34rpx;
+  font-weight: 600;
+}
+
+.who-sub {
+  display: block;
+  margin-top: 10rpx;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 26rpx;
+}
+
+.stat-card {
+  display: flex;
+  align-items: stretch;
+  margin: -64rpx 32rpx 0;
+  padding: 28rpx 0;
+  background: #ffffff;
+  border-radius: 16rpx;
+  box-shadow: 0 12rpx 32rpx rgba(26, 86, 176, 0.12);
+}
+
+.stat {
+  flex: 1;
+  text-align: center;
+}
+
+.stat-split {
+  width: 1px;
+  margin: 8rpx 0;
+  background: #e6ebf2;
+}
+
+.stat-label {
+  display: block;
+  color: #8a94a6;
+  font-size: 24rpx;
+}
+
+.stat-value {
+  display: block;
+  margin-top: 12rpx;
+  color: #1c2430;
+  font-size: 36rpx;
+  font-weight: 600;
+}
+
+.ban-pad {
+  margin: 24rpx 32rpx 0;
+}
+
+.panel {
+  margin: 24rpx 32rpx 0;
+  padding: 28rpx;
+  background: #ffffff;
+  border-radius: 16rpx;
+}
+
+.panel-title {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.logout {
+  width: auto;
+  height: 96rpx;
+  margin: 24rpx 32rpx 0;
+  padding: 0;
+  background: #ffffff;
+  color: #1a56b0;
+  font-size: 30rpx;
+  line-height: 96rpx;
+  text-align: center;
+}
+
+.empty {
+  padding: 80rpx 32rpx;
+}
+
+.empty-title {
+  color: #8a94a6;
+  font-size: 30rpx;
+}

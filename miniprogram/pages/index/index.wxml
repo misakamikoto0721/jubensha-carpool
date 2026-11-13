@@ -1,24 +1,17 @@
 <view class="page">
-  <view class="hero">
-    <text class="kicker">社团内部</text>
-    <text class="title">正在报名的车</text>
-    <view class="me" wx:if="{{user}}">
-      <text>{{user.name}} · {{user.roleText}}</text>
-      <text class="muted">爽约 {{user.noShowCount}} 次</text>
+  <view class="head">
+    <view class="head-copy">
+      <text class="title">正在报名</text>
     </view>
-    <view class="me" wx:else>
-      <text>还没有绑定学号</text>
-      <button class="text-btn" bindtap="goLogin">去绑定</button>
-    </view>
-    <view class="ban" wx:if="{{user && user.banText}}">{{user.banText}}</view>
+    <button wx:if="{{canCreate}}" class="primary slim" bindtap="goCreate">发车</button>
   </view>
 
-  <button wx:if="{{canCreate}}" class="primary block" bindtap="goCreate">发布车次</button>
+  <view class="ban" wx:if="{{user && user.banText}}">{{user.banText}}</view>
 
   <view wx:if="{{loading}}" class="hint">正在加载</view>
-  <view wx:elif="{{sessions.length === 0}}" class="empty card">
-    <text class="empty-title">还没有开放的车次</text>
-    <text class="empty-sub">DM 发布后会出现在这里，也可以从 QQ 群的卡片直接进来。</text>
+  <view wx:elif="{{sessions.length === 0}}" class="empty">
+    <text class="empty-title">还没有车</text>
+    <text class="empty-sub">DM 发出一场后，会出现在这里。</text>
   </view>
   <view wx:else class="list">
     <view
@@ -36,25 +29,9 @@
       <text class="meta">{{item.timeText}}</text>
       <text class="meta">{{item.location}}</text>
       <view class="session-bottom">
-        <text>{{item.seatText}} 人</text>
-        <text class="muted" wx:if="{{item.dmName}}">DM {{item.dmName}}</text>
+        <text class="remain {{item.remainOpen ? 'hot' : ''}}">{{item.remainText}}</text>
+        <text class="muted">{{item.seatText}}<text wx:if="{{item.dmName}}"> · {{item.dmName}}</text></text>
       </view>
     </view>
-  </view>
-
-  <view class="card admin" wx:if="{{user && user.role === 'admin'}}">
-    <text class="admin-title">设置成员身份</text>
-    <text class="hint">DM 才能发布车次。对方需要先在小程序里绑定过学号。</text>
-    <view class="field">
-      <text class="label">学号</text>
-      <input class="input" placeholder="例如 PB220001" value="{{roleStudentId}}" bindinput="onRoleStudentId" />
-    </view>
-    <view class="field">
-      <text class="label">身份</text>
-      <picker mode="selector" range="{{roleLabels}}" value="{{roleIndex}}" bindchange="onRolePick">
-        <view class="input picker">{{roleLabels[roleIndex]}}</view>
-      </picker>
-    </view>
-    <button class="ghost block" bindtap="submitRole">保存身份</button>
   </view>
 </view>

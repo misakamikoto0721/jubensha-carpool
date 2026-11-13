@@ -11,6 +11,7 @@ module.exports = async function createSession(event, cloud) {
   }
   const input = domain.validateSessionInput(event, now)
   if (!input.ok) return input
+  await users.ensureCollection(db, 'sessions')
 
   const added = await db.collection('sessions').add({
     data: {

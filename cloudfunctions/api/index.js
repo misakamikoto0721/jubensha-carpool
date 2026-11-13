@@ -7,6 +7,8 @@ const handlers = {
   authStart: require('./handlers/authStart'),
   authFinish: require('./handlers/authFinish'),
   bindUid: require('./handlers/bindUid'),
+  devLogin: require('./handlers/devLogin'),
+  logout: require('./handlers/logout'),
   createSession: require('./handlers/createSession'),
   joinSession: require('./handlers/joinSession'),
   cancelJoin: require('./handlers/cancelJoin'),
@@ -27,6 +29,11 @@ exports.main = async (event) => {
     return await handler(payload, cloud)
   } catch (err) {
     console.error('[api]', action, err)
-    return { ok: false, reason: 'internal', message: '服务暂时不可用，请稍后再试' }
+    const detail = String((err && (err.errMsg || err.message)) || '').replace(/\s+/g, ' ').slice(0, 120)
+    return {
+      ok: false,
+      reason: 'internal',
+      message: detail || '服务暂时不可用，请稍后再试'
+    }
   }
 }

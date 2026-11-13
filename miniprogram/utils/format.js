@@ -29,12 +29,23 @@ function decorateUser(user) {
   })
 }
 
+function remainText(session) {
+  const left = session.capacity - session.joinedCount
+  if (session.status === 'completed') return '已结束'
+  if (session.status === 'closed') return '已截止'
+  if (session.status === 'full' || left <= 0) return '已满'
+  return '还差 ' + left + ' 人'
+}
+
 function decorateSession(session) {
   const pendingMark = session.status !== 'completed' && session.startTime <= Date.now()
+  const left = session.capacity - session.joinedCount
   return Object.assign({}, session, {
     timeText: time.formatDateTime(session.startTime),
     statusText: pendingMark ? '待标记' : (STATUS_TEXT[session.status] || session.status),
     seatText: session.joinedCount + ' / ' + session.capacity,
+    remainText: remainText(session),
+    remainOpen: session.status === 'open' && left > 0,
     pendingMark: pendingMark
   })
 }

@@ -1,4 +1,3 @@
-const config = require('./config')
 const domain = require('./domain')
 
 function currentOpenId(cloud) {
@@ -16,9 +15,18 @@ function isMissingCollection(err) {
   return msg.indexOf('not exist') >= 0 || msg.indexOf('DATABASE_COLLECTION_NOT_EXIST') >= 0 || msg.indexOf('不存在') >= 0 || code === -502005
 }
 
-function isListedAdmin(studentId) {
-  const target = domain.normalizeStudentId(studentId)
-  return (config.adminStudentIds || []).some((item) => domain.normalizeStudentId(item) === target)
+function collectionAlreadyExists(err) {
+  const msg = String((err && (err.errMsg || err.message)) || '').toLowerCase()
+  const code = Number(err && err.errCode)
+  return code === -501001 || code === -502002 || msg.indexOf('exist') >= 0 || msg.indexOf('已存在') >= 0
+}
+
+async function ensureCollection(db, name) {
+  try {
+    await db.createCollection(name)
+  } catch (err) {
+    if (!collectionAlreadyExists(err)) throw err
+  }
 }
 
 async function safeList(promise) {
@@ -58,13 +66,6 @@ async function clearExpiredBan(db, user, now) {
     user.credit_status = 'normal'
     user.ban_until = null
   }
-  return user
-}
-
-async function promoteConfiguredAdmin(db, user) {
-  if (!user || user.role === 'admin' || !isListedAdmin(user.uid)) return user
-  await db.collection('users').doc(user._id).update({ data: { role: 'admin' } })
-  user.role = 'admin'
   return user
 }
 
@@ -111,7 +112,6 @@ async function requireUser(db, cloud, now) {
   let user = await findUserByUid(db, identity.uid)
   if (!user) return { ok: true, openid: openid, user: null, identity: identity }
   user = await clearExpiredBan(db, user, now)
-  user = await promoteConfiguredAdmin(db, user)
   return { ok: true, openid: openid, user: user, identity: identity }
 }
 
@@ -119,7 +119,7 @@ module.exports = {
   currentOpenId: currentOpenId,
   providerOf: providerOf,
   isMissingCollection: isMissingCollection,
-  isListedAdmin: isListedAdmin,
+  ensureCollection: ensureCollection,
   safeList: safeList,
   findIdentity: findIdentity,
   findUserByUid: findUserByUid,

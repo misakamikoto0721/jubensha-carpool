@@ -1,5 +1,6 @@
 const users = require('../users')
 const ustcAuth = require('../ustcAuth')
+const devUser = require('../devUser')
 
 module.exports = async function login(event, cloud) {
   const db = cloud.database()
@@ -11,6 +12,7 @@ module.exports = async function login(event, cloud) {
   const loaded = await users.requireUser(db, cloud, now)
   if (!loaded.ok) return loaded
   const auth = ustcAuth.publicStatus()
-  if (!loaded.user) return { ok: true, bound: false, auth: auth }
-  return { ok: true, bound: true, user: users.presentUser(loaded.user), auth: auth }
+  const devLogin = !!devUser.enabled
+  if (!loaded.user) return { ok: true, bound: false, auth: auth, devLogin: devLogin }
+  return { ok: true, bound: true, user: users.presentUser(loaded.user), auth: auth, devLogin: devLogin }
 }

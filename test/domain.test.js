@@ -97,6 +97,16 @@ test('only the hosting DM or an admin can mark attendance', () => {
   assert.equal(domain.canManageSession(player({ role: 'admin' }), car), true)
 })
 
+test('only an admin can add or remove a DM', () => {
+  const admin = player({ role: 'admin' })
+  const member = player({ uid: 'PB0003', role: 'player' })
+  assert.equal(domain.decideRoleChange(admin, member, 'dm').ok, true)
+  assert.equal(domain.decideRoleChange(admin, member, 'player').role, 'player')
+  assert.equal(domain.decideRoleChange(member, member, 'dm').reason, 'forbidden')
+  assert.equal(domain.decideRoleChange(admin, player({ role: 'admin' }), 'dm').reason, 'forbidden')
+  assert.equal(domain.decideRoleChange(admin, member, 'admin').reason, 'invalid_role')
+})
+
 test('attendance must cover exactly the people on the car', () => {
   assert.equal(domain.sameMembers(['A', 'B'], ['B', 'A']), true)
   assert.equal(domain.sameMembers(['A'], ['A', 'B']), false)

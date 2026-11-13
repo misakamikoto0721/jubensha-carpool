@@ -9,27 +9,29 @@
   <block wx:else>
     <text class="kicker">{{session.statusText}}</text>
     <text class="title">{{session.scriptName}}</text>
-    <view class="card meta-card">
-      <view class="row"><text class="label">时间</text><text>{{session.timeText}}</text></view>
-      <view class="row"><text class="label">地点</text><text>{{session.location}}</text></view>
-      <view class="row"><text class="label">人数</text><text>{{session.seatText}}</text></view>
-      <view class="row" wx:if="{{session.dmName}}"><text class="label">DM</text><text>{{session.dmName}}</text></view>
-    </view>
+    <text class="remain {{session.remainOpen ? 'hot' : ''}}">{{session.remainText}}</text>
+    <text class="seat">{{session.seatText}} 人</text>
 
-    <button class="ghost block" bindtap="copyLibrary">复制研讨室预约链接</button>
+    <view class="facts">
+      <text class="fact">{{session.timeText}}</text>
+      <text class="fact">{{session.location}}</text>
+      <text class="fact" wx:if="{{session.dmName}}">DM {{session.dmName}}</text>
+    </view>
 
     <view class="section">
       <text class="section-title">车上的人</text>
-      <view wx:if="{{members.length === 0}}" class="hint">还没有人上车</view>
+      <view wx:if="{{members.length === 0}}" class="hint tight">还没有人上车</view>
       <view wx:for="{{members}}" wx:key="uid" class="member">
         <text>{{item.name}}</text>
         <text class="muted">{{item.statusText}}</text>
       </view>
     </view>
 
+    <text class="link" bindtap="copyLibrary">复制研讨室预约链接</text>
+
     <view class="section card" wx:if="{{canMark && draft.length}}">
       <text class="section-title">标记到场</text>
-      <text class="hint">活动结束后提交。未到的人选爽约。</text>
+      <text class="hint tight">活动结束后提交。未到的人选爽约。</text>
       <view wx:for="{{draft}}" wx:key="uid" class="mark-row">
         <text>{{item.name}}</text>
         <view class="choices">
@@ -53,8 +55,8 @@
   </block>
 
   <view class="dock" wx:if="{{session}}">
-    <button class="ghost" open-type="share">分享到群</button>
-    <button wx:if="{{needBind}}" class="primary" bindtap="goLogin">绑定学号</button>
+    <button class="share" open-type="share">分享</button>
+    <button wx:if="{{needBind}}" class="primary" bindtap="goLogin">登录后上车</button>
     <button wx:elif="{{canJoin}}" class="primary" bindtap="join">上车</button>
     <button wx:elif="{{canCancel}}" class="ghost danger" bindtap="cancelJoin">取消上车</button>
     <view wx:else class="dock-note">{{joinBlockReason}}</view>

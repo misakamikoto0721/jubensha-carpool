@@ -8,7 +8,8 @@ function loadMe() {
     return {
       bound: !!result.bound,
       user: user,
-      auth: result.auth || { configured: false, mode: 'student_id' }
+      auth: result.auth || { configured: false, mode: 'student_id' },
+      devLogin: !!result.devLogin
     }
   })
 }

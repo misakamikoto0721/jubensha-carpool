@@ -1,0 +1,62 @@
+.lead {
+  display: block;
+}
+
+.list {
+  margin-top: 28rpx;
+}
+
+.script {
+  margin-bottom: 20rpx;
+}
+
+.script-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.script-name {
+  font-size: 36rpx;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.run {
+  margin-top: 16rpx;
+  padding-top: 16rpx;
+  border-top: 1px solid #efe6d8;
+}
+
+.run-hover {
+  opacity: 0.72;
+}
+
+.run-time {
+  display: block;
+  font-size: 28rpx;
+}
+
+.run-meta {
+  display: block;
+  margin-top: 4rpx;
+  color: #6d645b;
+  font-size: 26rpx;
+}
+
+.empty {
+  margin-top: 48rpx;
+}
+
+.empty-title {
+  display: block;
+  font-size: 34rpx;
+  font-weight: 600;
+}
+
+.empty-sub {
+  display: block;
+  margin-top: 8rpx;
+  color: #6d645b;
+}
