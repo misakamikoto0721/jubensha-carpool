@@ -11,10 +11,13 @@ const handlers = {
   logout: require('./handlers/logout'),
   createSession: require('./handlers/createSession'),
   joinSession: require('./handlers/joinSession'),
+  drawSession: require('./handlers/drawSession'),
+  pullMember: require('./handlers/pullMember'),
   cancelJoin: require('./handlers/cancelJoin'),
   markAttendance: require('./handlers/markAttendance'),
   getSession: require('./handlers/getSession'),
   listSessions: require('./handlers/listSessions'),
+  listPendingMarks: require('./handlers/listPendingMarks'),
   setRole: require('./handlers/setRole')
 }
 

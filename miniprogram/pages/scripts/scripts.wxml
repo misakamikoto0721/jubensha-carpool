@@ -24,7 +24,8 @@
         bindtap="openDetail"
       >
         <text class="run-time">{{run.timeText}}</text>
-        <text class="run-meta">{{run.location}} · {{run.remainText}}</text>
+        <text class="run-meta">{{run.kindText}} · {{run.location}} · {{run.remainText}}</text>
+        <text class="run-meta" wx:if="{{run.drawText}}">{{run.drawText}}</text>
       </view>
     </view>
   </view>

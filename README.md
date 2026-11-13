@@ -16,7 +16,7 @@
 |---|---|---|
 | 主页 | `pages/index/index` | 正在报名的车。DM 或管理员可以发车 |
 | 剧本 | `pages/scripts/scripts` | 把这些车按剧本名归在一起 |
-| 我的 | `pages/me/me` | 姓名、学号、身份、爽约次数。管理员可把别人加入 DM。登出回到登录页 |
+| 我的 | `pages/me/me` | 姓名、学号、身份、爽约次数。已经开车、还没标记的车在这里。管理员可把别人加入 DM。登出回到登录页 |
 
 发车 `pages/session/create/create` 和车次详情 `pages/session/detail/detail` 从底栏里打开，不占底栏。研讨室不在小程序里预约，详情页复制 `http://ic.lib.ustc.edu.cn/`。
 
@@ -26,7 +26,7 @@
 
 - `auth_identities`：`openid → uid`。登出只删这条连接。
 - `users`：一个人一条。`uid`、`student_id`、`name`、`role`（`player` / `dm` / `admin`）、`credit_status`、`ban_until`、`no_show_count`。
-- `sessions`：一场车。`dm_uid`、`script_name`、`start_time`、`location`、`capacity`、`status`、`joined_count`、`member_uids`。
+- `sessions`：一场车。`dm_uid`、`script_name`、`kind`（`private` 私车 / `weekly` 周常）、`start_time`、`end_time`、`draw_deadline`（仅周常）、`draw_status`、`location`、`capacity`、`status`、`joined_count`、`member_uids`、`missed_uids`、`applicant_count`、`applicant_uids`。没有 `kind` 的旧车按私车。
 - `signups`：报名。文档 id 是 `车次 id_uid`。
 - `oauth_states`：统一认证的一次性 state，10 分钟，用完即删。
 
@@ -48,11 +48,14 @@ wx.cloud.callFunction({ name: 'api', data: { action, ... } })
 | `authStart` | 未配置时返回 `configured: false`。已配置时返回科大授权地址和 `state` |
 | `authFinish` | 校验 `code` + `state`，向科大换身份，写入 `users` 和 `auth_identities` |
 | `logout` | 删除当前 openid 的连接。用户记录和爽约保留 |
-| `listSessions` | 报名中和已满的车 |
+| `listSessions` | 还没到开车时间的车。到点后从主页和剧本列表消失，不删记录 |
+| `listPendingMarks` | DM 或管理员在「我的」里看已经开车、还没标记的车 |
 | `getSession` | 一场车的详情、名单、当前用户能否上车 |
-| `createSession` | DM 或管理员发车 |
-| `joinSession` | 上车 |
-| `cancelJoin` | 标记到场前取消上车 |
+| `createSession` | DM 或管理员发车。要带 `kind`、`startTime`、`endTime` |
+| `joinSession` | 私车先到先得，满员拒绝。周常不限人数，记成等待抽签，抽签截止后拒绝 |
+| `drawSession` | 周常过了抽签截止后抽一次。详情打开时也会抽。抽中的人上车 |
+| `pullMember` | 私车的本场 DM 或管理员按学号超额拉人。周常不能用 |
+| `cancelJoin` | 标记到场前取消上车或取消周常报名 |
 | `markAttendance` | 本场 DM 或管理员，把车上每个人标成到场或爽约 |
 | `setRole` | 仅管理员。`role` 只能是 `dm` 或 `player` |
 
@@ -74,6 +77,10 @@ wx.cloud.callFunction({ name: 'api', data: { action, ... } })
 node --test test/domain.test.js test/ustcAuth.test.js test/devUser.test.js
 ```
 
+## 还没做
+
+记在 [Agent.md](Agent.md) 的「后续要做」：小程序内的私聊，以及每场车次一个群；每个人按到场记录形成已打本单，二刷报名时提醒玩家，并在 DM 的名单里高亮。这些都还没有页面和接口。
+
 ## 范围之外
 
-不做支付、抽签、候补、剧本库、角色槽、评分、订阅消息，也不做另一套 QQ 小程序。微信小程序在 QQ 里打开即可。研讨室是外链，不是接口。
+不做支付、候补队列、剧本库、角色槽、评分、订阅消息，也不做另一套 QQ 小程序。周常会在截止时间后抽签。微信小程序在 QQ 里打开即可。研讨室是外链，不是接口。

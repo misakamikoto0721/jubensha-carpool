@@ -1,7 +1,13 @@
-<view class="gate">
-  <view class="gate-mark">科大</view>
-  <text class="gate-school">中国科学技术大学</text>
-  <text class="gate-app">剧本杀拼车</text>
-  <button class="enter" bindtap="openUstc">统一身份认证登录</button>
-  <button wx:if="{{devLogin}}" class="temp" bindtap="useDevAccount">临时登录</button>
+<view class="login">
+  <image class="logo" src="/assets/club-logo.png" mode="aspectFit" />
+  <text class="heading">剧本杀拼车</text>
+  <text class="sub">登录后进入拼车</text>
+  <view class="pill" hover-class="pill-hover" bindtap="openUstc">
+    <text class="pill-text">统一身份认证登录</text>
+    <text class="pill-arrow">→</text>
+  </view>
+  <view wx:if="{{devLogin}}" class="pill temp" hover-class="pill-hover" bindtap="useDevAccount">
+    <text class="pill-text">临时登录</text>
+    <text class="pill-arrow">→</text>
+  </view>
 </view>

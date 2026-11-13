@@ -77,6 +77,11 @@
   color: #8f2d2a;
 }
 
+.pill-drawn {
+  background: #e7eef8;
+  color: #1a56b0;
+}
+
 .pill-completed,
 .pill-closed {
   background: #eee7dc;

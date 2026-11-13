@@ -62,6 +62,10 @@
   border-bottom: 1px solid #efe6d8;
 }
 
+.pull-input {
+  margin-top: 16rpx;
+}
+
 .link {
   display: inline-block;
   margin-top: 28rpx;

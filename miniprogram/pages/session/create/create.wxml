@@ -4,6 +4,14 @@
 
   <view class="card form">
   <view class="field">
+    <text class="label">车型</text>
+    <view class="kind-row">
+      <view class="kind {{kind === 'private' ? 'on' : ''}}" data-kind="private" bindtap="pickKind">私车</view>
+      <view class="kind {{kind === 'weekly' ? 'on' : ''}}" data-kind="weekly" bindtap="pickKind">周常</view>
+    </view>
+    <text class="note">{{kindNote}}</text>
+  </view>
+  <view class="field">
     <text class="label">剧本名</text>
     <input class="input" placeholder="今天开哪本" value="{{scriptName}}" bindinput="onScriptName" />
   </view>
@@ -19,11 +27,33 @@
     </view>
   </view>
   <view class="field">
+    <text class="label">结束时间</text>
+    <view class="time-row">
+      <picker mode="date" value="{{endDate}}" bindchange="onEndDate">
+        <view class="input picker">{{endDate}}</view>
+      </picker>
+      <picker mode="time" value="{{endClock}}" bindchange="onEndClock">
+        <view class="input picker">{{endClock}}</view>
+      </picker>
+    </view>
+  </view>
+  <view class="field" wx:if="{{kind === 'weekly'}}">
+    <text class="label">抽签截止</text>
+    <view class="time-row">
+      <picker mode="date" value="{{drawDate}}" bindchange="onDrawDate">
+        <view class="input picker">{{drawDate}}</view>
+      </picker>
+      <picker mode="time" value="{{drawClock}}" bindchange="onDrawClock">
+        <view class="input picker">{{drawClock}}</view>
+      </picker>
+    </view>
+  </view>
+  <view class="field">
     <text class="label">地点</text>
     <input class="input" placeholder="西图研讨室 / 活动室" value="{{location}}" bindinput="onLocation" />
   </view>
   <view class="field">
-    <text class="label">人数上限</text>
+    <text class="label">{{capacityLabel}}</text>
     <view class="stepper">
       <button class="ghost step" data-step="-1" bindtap="changeCapacity">-</button>
       <text class="count">{{capacity}}</text>

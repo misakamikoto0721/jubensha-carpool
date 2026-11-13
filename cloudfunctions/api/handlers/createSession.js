@@ -17,12 +17,19 @@ module.exports = async function createSession(event, cloud) {
     data: {
       dm_uid: loaded.user.uid,
       script_name: input.scriptName,
+      kind: input.kind,
       start_time: input.startTime,
+      end_time: input.endTime,
+      draw_deadline: input.drawDeadline,
+      draw_status: input.kind === 'weekly' ? 'pending' : 'none',
       location: input.location,
       capacity: input.capacity,
       status: 'open',
       joined_count: 0,
       member_uids: [],
+      missed_uids: [],
+      applicant_count: 0,
+      applicant_uids: [],
       created_at: now
     }
   })

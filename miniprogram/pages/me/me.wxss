@@ -98,6 +98,25 @@
   font-weight: 600;
 }
 
+.pending {
+  margin-top: 20rpx;
+  padding-top: 16rpx;
+  border-top: 1px solid #e6ebf2;
+}
+
+.pending-name {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.pending-meta {
+  display: block;
+  margin-top: 4rpx;
+  color: #8a94a6;
+  font-size: 24rpx;
+}
+
 .logout {
   width: auto;
   height: 96rpx;

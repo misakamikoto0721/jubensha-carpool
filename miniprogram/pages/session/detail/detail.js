@@ -11,9 +11,14 @@ Page({
     members: [],
     draft: [],
     needBind: false,
+    applicants: [],
+    missed: [],
     canJoin: false,
     canCancel: false,
     canMark: false,
+    canPull: false,
+    mySeat: '',
+    pullStudentId: '',
     joinBlockReason: ''
   },
 
@@ -53,11 +58,15 @@ Page({
           loading: false,
           session: session,
           members: members,
+          applicants: (result.applicants || []).map(format.decorateMember),
+          missed: (result.missed || []).map(format.decorateMember),
           draft: draft,
           needBind: !!permissions.needBind,
           canJoin: !!permissions.canJoin,
           canCancel: !!permissions.canCancel,
           canMark: !!permissions.canMark,
+          canPull: !!permissions.canPull,
+          mySeat: permissions.mySeat || '',
           joinBlockReason: permissions.joinBlockReason || ''
         })
       })
@@ -91,6 +100,25 @@ Page({
     api.withLoading(() => api.call('cancelJoin', { sessionId: this.sessionId }))
       .then(() => this.load())
       .catch(() => {})
+  },
+
+  onPullStudentId(event) {
+    this.setData({ pullStudentId: event.detail.value })
+  },
+
+  pullMember() {
+    const studentId = String(this.data.pullStudentId || '').trim()
+    if (!studentId) {
+      wx.showToast({ title: '先填写学号', icon: 'none' })
+      return
+    }
+    api.withLoading(() => api.call('pullMember', {
+      sessionId: this.sessionId,
+      studentId: studentId
+    })).then(() => {
+      this.setData({ pullStudentId: '' })
+      return this.load()
+    }).catch(() => {})
   },
 
   pickMark(event) {

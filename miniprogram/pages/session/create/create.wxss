@@ -2,6 +2,36 @@
   margin-top: 32rpx;
 }
 
+.kind-row {
+  display: flex;
+  gap: 16rpx;
+}
+
+.kind {
+  flex: 1;
+  height: 88rpx;
+  line-height: 88rpx;
+  text-align: center;
+  background: #ffffff;
+  border: 1px solid #d5dbe3;
+  border-radius: 12rpx;
+  box-sizing: border-box;
+}
+
+.kind.on {
+  background: #1a56b0;
+  border-color: #1a56b0;
+  color: #ffffff;
+}
+
+.note {
+  display: block;
+  margin-top: 12rpx;
+  color: #8a94a6;
+  font-size: 24rpx;
+  line-height: 1.5;
+}
+
 .form .field:first-child {
   margin-top: 0;
 }

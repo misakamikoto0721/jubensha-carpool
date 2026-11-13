@@ -1,4 +1,5 @@
 const api = require('../../utils/api')
+const format = require('../../utils/format')
 const session = require('../../utils/session')
 
 Page({
@@ -6,7 +7,8 @@ Page({
     loading: true,
     user: null,
     initial: '',
-    dmStudentId: ''
+    dmStudentId: '',
+    pending: []
   },
 
   onShow() {
@@ -26,9 +28,22 @@ Page({
         const user = me.user
         const initial = user && user.name ? user.name.slice(0, 1) : ''
         this.setData({ loading: false, user: user, initial: initial })
+        if (!user || (user.role !== 'dm' && user.role !== 'admin')) {
+          this.setData({ pending: [] })
+          return null
+        }
+        return api.call('listPendingMarks').catch((err) => {
+          api.showError(err)
+          return null
+        })
+      })
+      .then((result) => {
+        if (!result) return
+        const pending = (result.sessions || []).map(format.decorateSession)
+        this.setData({ pending: pending })
       })
       .catch((err) => {
-        this.setData({ loading: false, user: null })
+        this.setData({ loading: false, user: null, pending: [] })
         api.showError(err)
       })
   },
@@ -44,6 +59,11 @@ Page({
         wx.reLaunch({ url: '/pages/login/login' })
       })
       .catch(() => {})
+  },
+
+  openDetail(event) {
+    const id = event.currentTarget.dataset.id
+    wx.navigateTo({ url: '/pages/session/detail/detail?id=' + id })
   },
 
   onDmStudentId(event) {

@@ -23,6 +23,21 @@
 
   <view class="ban ban-pad" wx:if="{{user.banText}}">{{user.banText}}</view>
 
+  <view class="panel" wx:if="{{pending.length}}">
+    <text class="panel-title">待标记</text>
+    <text class="hint">已经开车的场次不在剧本列表里。打开这场，标记到场或爽约。</text>
+    <view
+      class="pending"
+      wx:for="{{pending}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="openDetail"
+    >
+      <text class="pending-name">{{item.scriptName}}</text>
+      <text class="pending-meta">{{item.timeText}}</text>
+    </view>
+  </view>
+
   <view class="panel" wx:if="{{user.role === 'admin'}}">
     <text class="panel-title">DM 工作组</text>
     <text class="hint">填写对方学号。加入后，对方可以发车。</text>

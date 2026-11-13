@@ -37,12 +37,34 @@ function validateProfile(studentId, name) {
   return { ok: true, studentId: id, name: displayName }
 }
 
+const BOARD_STATUS = { open: true, full: true, drawn: true }
+
+function visibleOnBoard(session, now) {
+  if (!session || !BOARD_STATUS[session.status]) return false
+  return Number(session.start_time) > now
+}
+
+function needsMark(session, now) {
+  if (!session || !BOARD_STATUS[session.status]) return false
+  return Number(session.start_time) <= now
+}
+
+function sessionKind(session) {
+  return session && session.kind === 'weekly' ? 'weekly' : 'private'
+}
+
+function timeInWindow(ts, now) {
+  return Number.isFinite(ts) && ts >= now - DAY_MS && ts <= now + 180 * DAY_MS
+}
+
 function validateSessionInput(input, now) {
   const source = input || {}
   const scriptName = String(source.scriptName || '').trim()
   const location = String(source.location || '').trim()
   const capacity = Math.floor(Number(source.capacity))
   const startTime = Number(source.startTime)
+  const endTime = Number(source.endTime)
+  const kind = source.kind
   if (scriptName.length < 1 || scriptName.length > 40) {
     return fail('invalid_script', '剧本名需要在 1 到 40 个字之间')
   }
@@ -50,20 +72,48 @@ function validateSessionInput(input, now) {
     return fail('invalid_location', '地点需要在 1 到 40 个字之间')
   }
   if (!Number.isFinite(capacity) || capacity < 1 || capacity > 20) {
-    return fail('invalid_capacity', '人数上限需要是 1 到 20 的整数')
+    return fail('invalid_capacity', '人数需要是 1 到 20 的整数')
+  }
+  if (kind !== 'weekly' && kind !== 'private') {
+    return fail('invalid_kind', '请选择周常或私车')
   }
   if (!Number.isFinite(startTime)) {
     return fail('invalid_time', '请选择开始时间')
   }
-  if (startTime < now - DAY_MS || startTime > now + 180 * DAY_MS) {
+  if (!timeInWindow(startTime, now)) {
     return fail('invalid_time', '开始时间需要在昨天到半年之内')
+  }
+  if (!Number.isFinite(endTime)) {
+    return fail('invalid_time', '请选择结束时间')
+  }
+  if (endTime <= startTime) {
+    return fail('invalid_time', '结束时间要晚于开始时间')
+  }
+  if (!timeInWindow(endTime, now)) {
+    return fail('invalid_time', '结束时间需要在昨天到半年之内')
+  }
+  let drawDeadline = null
+  if (kind === 'weekly') {
+    drawDeadline = Number(source.drawDeadline)
+    if (!Number.isFinite(drawDeadline)) {
+      return fail('invalid_time', '请选择抽签截止时间')
+    }
+    if (drawDeadline >= startTime) {
+      return fail('invalid_time', '抽签截止要早于开始时间')
+    }
+    if (!timeInWindow(drawDeadline, now)) {
+      return fail('invalid_time', '抽签截止时间需要在昨天到半年之内')
+    }
   }
   return {
     ok: true,
     scriptName: scriptName,
     location: location,
     capacity: capacity,
-    startTime: startTime
+    kind: kind,
+    startTime: startTime,
+    endTime: endTime,
+    drawDeadline: drawDeadline
   }
 }
 
@@ -79,7 +129,7 @@ function banActive(user, now) {
   return user.credit_status === 'restricted' && Number(user.ban_until) > now
 }
 
-function decideJoin({ user, session, now }) {
+function joinGate({ user, session, now }) {
   if (!user) return fail('unbound', '绑定学号后才能上车')
   if (banActive(user, now)) {
     return fail('restricted', '限制报名至 ' + formatDateTime(user.ban_until), {
@@ -88,12 +138,102 @@ function decideJoin({ user, session, now }) {
   }
   if (!session) return fail('not_found', '车次不存在')
   if (session.status === 'completed') return fail('completed', '这场已经结束')
+  if (sessionKind(session) === 'weekly' && weeklyDrawState(session) === 'done') {
+    return fail('drawn', '已经抽过签')
+  }
+  if (sessionKind(session) === 'weekly' && weeklySignupFrozen(session, now)) {
+    return fail('draw_closed', '抽签已截止')
+  }
+  if (session.status !== 'open' && session.status !== 'full') {
+    return fail('closed', '这场已停止报名')
+  }
+  if (session.start_time <= now) return fail('started', '已经开始，不能再上车')
+  return { ok: true }
+}
+
+function decidePrivateJoin(session) {
   const joinedCount = session.joined_count || 0
   if (session.status === 'full' || joinedCount >= session.capacity) {
     return fail('full', '已经满员')
   }
-  if (session.status !== 'open') return fail('closed', '这场已停止报名')
-  if (session.start_time <= now) return fail('started', '已经开始，不能再上车')
+  return { ok: true, placement: 'joined' }
+}
+
+function decideWeeklyJoin() {
+  return { ok: true, placement: 'waiting' }
+}
+
+function decideJoin(input) {
+  const gate = joinGate(input)
+  if (!gate.ok) return gate
+  if (sessionKind(input.session) === 'weekly') return decideWeeklyJoin()
+  return decidePrivateJoin(input.session)
+}
+
+function weeklyDrawState(session) {
+  if (session && (session.draw_status === 'done' || session.status === 'drawn')) return 'done'
+  return 'pending'
+}
+
+function weeklySignupFrozen(session, now) {
+  if (!session || sessionKind(session) !== 'weekly') return false
+  if (weeklyDrawState(session) === 'done') return true
+  return Number(session.draw_deadline) > 0 && now >= Number(session.draw_deadline)
+}
+
+function decideDraw(session, now) {
+  if (!session) return fail('not_found', '车次不存在')
+  if (sessionKind(session) !== 'weekly') return fail('wrong_kind', '只有周常要抽签')
+  if (weeklyDrawState(session) === 'done') return { ok: true, alreadyDrawn: true }
+  if (session.status === 'completed') return fail('completed', '这场已经结束')
+  if (!Number(session.draw_deadline)) return fail('no_deadline', '这场周常没有抽签截止时间')
+  if (now < Number(session.draw_deadline)) return fail('too_early', '还没到抽签截止时间')
+  return { ok: true, alreadyDrawn: false }
+}
+
+function drawWinners(uids, capacity, randomBelow) {
+  const pool = (uids || []).slice()
+  const seats = Math.max(0, Math.floor(Number(capacity) || 0))
+  const take = Math.min(pool.length, seats)
+  for (let index = 0; index < take; index += 1) {
+    const span = pool.length - index
+    const offset = randomBelow(span)
+    const swapIndex = index + offset
+    const current = pool[index]
+    pool[index] = pool[swapIndex]
+    pool[swapIndex] = current
+  }
+  return {
+    selected: pool.slice(0, take),
+    missed: pool.slice(take)
+  }
+}
+
+function nextSeatStatus(session, joinedCount) {
+  if (sessionKind(session) === 'weekly') return 'open'
+  return joinedCount >= session.capacity ? 'full' : 'open'
+}
+
+function decidePullIn({ actor, target, session, now, alreadyJoined }) {
+  if (!session) return fail('not_found', '车次不存在')
+  if (!canManageSession(actor, session)) {
+    return fail('forbidden', '只有本场 DM 或管理员可以拉人')
+  }
+  if (sessionKind(session) !== 'private') {
+    return fail('wrong_kind', '周常不在这里拉人，报名的人在等抽签')
+  }
+  if (!target) return fail('missing_user', '这个学号还没有登录过小程序')
+  if (banActive(target, now)) {
+    return fail('restricted', '这个人限制报名至 ' + formatDateTime(target.ban_until), {
+      banUntil: target.ban_until
+    })
+  }
+  if (session.status === 'completed') return fail('completed', '这场已经结束')
+  if (session.start_time <= now) return fail('started', '已经开始，不能再拉人')
+  if (session.status !== 'open' && session.status !== 'full') {
+    return fail('closed', '这场已停止报名')
+  }
+  if (alreadyJoined) return fail('already_joined', '这个人已经在车上')
   return { ok: true }
 }
 
@@ -155,10 +295,18 @@ module.exports = {
   formatDateTime: formatDateTime,
   normalizeStudentId: normalizeStudentId,
   validateProfile: validateProfile,
+  visibleOnBoard: visibleOnBoard,
+  needsMark: needsMark,
+  sessionKind: sessionKind,
   validateSessionInput: validateSessionInput,
   validateRole: validateRole,
   banActive: banActive,
   decideJoin: decideJoin,
+  weeklySignupFrozen: weeklySignupFrozen,
+  decideDraw: decideDraw,
+  drawWinners: drawWinners,
+  nextSeatStatus: nextSeatStatus,
+  decidePullIn: decidePullIn,
   applyNoShow: applyNoShow,
   canCreate: canCreate,
   canManageSession: canManageSession,

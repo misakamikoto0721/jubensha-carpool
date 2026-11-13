@@ -26,7 +26,8 @@
         <text class="script">{{item.scriptName}}</text>
         <text class="pill pill-{{item.pendingMark ? 'pending' : item.status}}">{{item.statusText}}</text>
       </view>
-      <text class="meta">{{item.timeText}}</text>
+      <text class="meta">{{item.kindText}} · {{item.timeText}}</text>
+      <text class="meta" wx:if="{{item.drawText}}">{{item.drawText}}</text>
       <text class="meta">{{item.location}}</text>
       <view class="session-bottom">
         <text class="remain {{item.remainOpen ? 'hot' : ''}}">{{item.remainText}}</text>
