@@ -53,6 +53,14 @@
   margin-top: 8rpx;
 }
 
+.member.replay {
+  background: #e7eef8;
+  margin: 0 -12rpx;
+  padding-left: 12rpx;
+  padding-right: 12rpx;
+  border-radius: 12rpx;
+}
+
 .member,
 .mark-row {
   display: flex;
@@ -64,6 +72,13 @@
 
 .pull-input {
   margin-top: 16rpx;
+}
+
+.chat-link {
+  display: block;
+  margin-top: 28rpx;
+  color: #1a56b0;
+  font-size: 26rpx;
 }
 
 .link {
@@ -118,6 +133,21 @@
   padding: 0 8rpx;
   color: #241c16;
   background: transparent;
+}
+
+.dock .complete {
+  flex: 1;
+  height: 88rpx;
+  margin: 0;
+  padding: 0;
+  color: #241c16;
+  font-weight: 600;
+  line-height: 88rpx;
+  background: transparent;
+}
+
+.dock .complete::after {
+  border: none;
 }
 
 .dock .primary,

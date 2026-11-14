@@ -1,0 +1,21 @@
+<view class="room">
+  <scroll-view class="log" scroll-y scroll-into-view="{{anchor}}" scroll-with-animation>
+    <view wx:if="{{failed}}" class="hint">{{failed}}</view>
+    <view wx:elif="{{messages.length === 0}}" class="hint">发一条消息，开始私聊。</view>
+    <view wx:for="{{messages}}" wx:key="id" class="row {{item.mine ? 'mine' : ''}}">
+      <view class="face">
+        <image wx:if="{{item.avatar}}" class="face-img" src="{{item.avatar}}" mode="aspectFill" />
+        <view wx:else class="face-fallback">{{item.initial}}</view>
+      </view>
+      <view class="msg">
+        <text class="who">{{item.nickname}}</text>
+        <text class="bubble">{{item.text}}</text>
+      </view>
+    </view>
+    <view id="bottom"></view>
+  </scroll-view>
+  <view class="composer">
+    <input class="input" placeholder="说点什么" value="{{draft}}" bindinput="onDraft" confirm-type="send" bindconfirm="send" />
+    <button class="primary send" bindtap="send">发送</button>
+  </view>
+</view>

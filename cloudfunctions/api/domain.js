@@ -175,6 +175,35 @@ function weeklyDrawState(session) {
   return 'pending'
 }
 
+function canAccessSessionChat(user, session) {
+  if (!user || !session) return false
+  if (user.uid === session.dm_uid) return true
+  const members = session.member_uids || []
+  if (members.indexOf(user.uid) >= 0) return true
+  if (weeklyDrawState(session) === 'done') return false
+  const applicants = session.applicant_uids || []
+  return applicants.indexOf(user.uid) >= 0
+}
+
+function validateMessageText(text) {
+  const value = String(text || '').trim()
+  if (!value) return fail('empty_message', '请输入内容')
+  if (value.length > 500) return fail('invalid_message', '一条消息最多 500 字')
+  return { ok: true, text: value }
+}
+
+function privateThreadId(left, right) {
+  const pair = [String(left || ''), String(right || '')].sort()
+  return pair[0] + '_' + pair[1]
+}
+
+function decidePrivatePeer(me, peer) {
+  if (!me) return fail('unbound', '登录后才能发消息')
+  if (!peer) return fail('missing_user', '这个学号还没有登录过小程序')
+  if (me.uid === peer.uid) return fail('self_chat', '不能和自己私聊')
+  return { ok: true, threadId: privateThreadId(me.uid, peer.uid) }
+}
+
 function weeklySignupFrozen(session, now) {
   if (!session || sessionKind(session) !== 'weekly') return false
   if (weeklyDrawState(session) === 'done') return true
@@ -276,6 +305,49 @@ function decideRoleChange(actor, target, role) {
   return { ok: true, role: role }
 }
 
+function playedScripts(user) {
+  if (!user || !Array.isArray(user.played_scripts)) return []
+  return user.played_scripts.filter((name) => !!name)
+}
+
+function hasPlayed(user, scriptName) {
+  const name = String(scriptName || '').trim()
+  if (!name) return false
+  return playedScripts(user).indexOf(name) >= 0
+}
+
+function withPlayedScript(user, scriptName) {
+  const name = String(scriptName || '').trim()
+  const list = playedScripts(user).slice()
+  if (name && list.indexOf(name) < 0) list.push(name)
+  return list
+}
+
+function displayName(user) {
+  if (!user) return ''
+  const nickname = String(user.nickname || '').trim()
+  if (nickname) return nickname
+  return user.name || user.uid || ''
+}
+
+function validateNickname(input) {
+  const nickname = String(input || '').trim()
+  if (nickname.length < 1 || nickname.length > 20) {
+    return fail('invalid_nickname', '昵称需要 1 到 20 个字')
+  }
+  return { ok: true, nickname: nickname }
+}
+
+function validateAvatarFileId(input, uid) {
+  if (input === '' || input === null) return { ok: true, avatarFileId: '' }
+  const value = String(input || '').trim()
+  const owned = !uid || value.indexOf('avatars/' + uid + '-') >= 0
+  if (value.indexOf('cloud://') !== 0 || value.length > 300 || !owned) {
+    return fail('invalid_avatar', '头像需要从相册上传')
+  }
+  return { ok: true, avatarFileId: value }
+}
+
 function signupDocId(sessionId, uid) {
   return sessionId + '_' + uid
 }
@@ -304,6 +376,10 @@ module.exports = {
   decideJoin: decideJoin,
   weeklySignupFrozen: weeklySignupFrozen,
   decideDraw: decideDraw,
+  canAccessSessionChat: canAccessSessionChat,
+  validateMessageText: validateMessageText,
+  privateThreadId: privateThreadId,
+  decidePrivatePeer: decidePrivatePeer,
   drawWinners: drawWinners,
   nextSeatStatus: nextSeatStatus,
   decidePullIn: decidePullIn,
@@ -311,6 +387,12 @@ module.exports = {
   canCreate: canCreate,
   canManageSession: canManageSession,
   decideRoleChange: decideRoleChange,
+  displayName: displayName,
+  playedScripts: playedScripts,
+  hasPlayed: hasPlayed,
+  withPlayedScript: withPlayedScript,
+  validateNickname: validateNickname,
+  validateAvatarFileId: validateAvatarFileId,
   signupDocId: signupDocId,
   sameMembers: sameMembers
 }

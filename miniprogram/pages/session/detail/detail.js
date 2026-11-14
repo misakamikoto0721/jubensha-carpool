@@ -16,7 +16,9 @@ Page({
     canJoin: false,
     canCancel: false,
     canMark: false,
+    canComplete: false,
     canPull: false,
+    canChat: false,
     mySeat: '',
     pullStudentId: '',
     joinBlockReason: ''
@@ -65,7 +67,9 @@ Page({
           canJoin: !!permissions.canJoin,
           canCancel: !!permissions.canCancel,
           canMark: !!permissions.canMark,
+          canComplete: !!permissions.canComplete,
           canPull: !!permissions.canPull,
+          canChat: !!permissions.canChat,
           mySeat: permissions.mySeat || '',
           joinBlockReason: permissions.joinBlockReason || ''
         })
@@ -74,6 +78,10 @@ Page({
         this.setData({ loading: false, missing: err.reason === 'not_found', session: null })
         if (err.reason !== 'not_found') api.showError(err)
       })
+  },
+
+  openGroup() {
+    wx.navigateTo({ url: '/pages/chat/group/group?id=' + this.sessionId })
   },
 
   goLogin() {
@@ -92,7 +100,16 @@ Page({
 
   join() {
     api.withLoading(() => api.call('joinSession', { sessionId: this.sessionId }))
-      .then(() => this.load())
+      .then((result) => {
+        if (result && result.replay) {
+          wx.showModal({
+            title: '二刷',
+            content: '你打过这本，仍然可以报名。',
+            showCancel: false
+          })
+        }
+        return this.load()
+      })
       .catch(() => {})
   },
 
@@ -129,6 +146,19 @@ Page({
       return Object.assign({}, item, { status: status })
     })
     this.setData({ draft: draft })
+  },
+
+  completeSession() {
+    wx.showModal({
+      title: '完成这场',
+      content: '车上的人都会记入这本的已打本单。完成后，这场从个人中心消失。',
+      success: (res) => {
+        if (!res.confirm) return
+        api.withLoading(() => api.call('completeSession', { sessionId: this.sessionId }))
+          .then(() => this.load())
+          .catch(() => {})
+      }
+    })
   },
 
   submitMarks() {

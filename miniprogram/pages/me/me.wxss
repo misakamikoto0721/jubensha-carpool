@@ -19,12 +19,19 @@
   width: 112rpx;
   height: 112rpx;
   border-radius: 50%;
+  overflow: hidden;
   background: rgba(255, 255, 255, 0.18);
   color: #ffffff;
   font-size: 44rpx;
   font-weight: 600;
   line-height: 112rpx;
   text-align: center;
+}
+
+.avatar-img {
+  width: 112rpx;
+  height: 112rpx;
+  border-radius: 50%;
 }
 
 .who-copy {
@@ -102,6 +109,12 @@
   margin-top: 20rpx;
   padding-top: 16rpx;
   border-top: 1px solid #e6ebf2;
+}
+
+.played {
+  display: block;
+  margin-top: 12rpx;
+  font-size: 28rpx;
 }
 
 .pending-name {

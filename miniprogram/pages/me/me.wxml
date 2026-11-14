@@ -1,11 +1,14 @@
 <view class="me" wx:if="{{!loading && user}}">
   <view class="hero">
     <view class="who">
-      <view class="avatar">{{initial}}</view>
-      <view class="who-copy">
-        <text class="who-line">{{user.name}} | {{user.studentId}}</text>
-        <text class="who-sub">{{user.roleText}}</text>
-      </view>
+    <view class="avatar" bindtap="changeAvatar">
+      <image wx:if="{{user.avatarFileId}}" class="avatar-img" src="{{user.avatarFileId}}" mode="aspectFill" />
+      <text wx:else>{{initial}}</text>
+    </view>
+    <view class="who-copy">
+      <text class="who-line">{{user.displayName || user.name}} | {{user.studentId}}</text>
+      <text class="who-sub">{{user.roleText}} · 轻点头像更换</text>
+    </view>
     </view>
   </view>
 
@@ -21,21 +24,31 @@
     </view>
   </view>
 
+  <view class="panel">
+    <text class="panel-title">个人资料</text>
+    <text class="hint">聊天里显示昵称和头像。没填昵称时，用认证姓名。</text>
+    <view class="field">
+      <text class="label">昵称</text>
+      <input class="input" placeholder="1 到 20 个字" value="{{nickname}}" bindinput="onNickname" />
+    </view>
+    <button class="primary block" bindtap="saveNickname">保存昵称</button>
+  </view>
+
   <view class="ban ban-pad" wx:if="{{user.banText}}">{{user.banText}}</view>
 
   <view class="panel" wx:if="{{pending.length}}">
-    <text class="panel-title">待标记</text>
-    <text class="hint">已经开车的场次不在剧本列表里。打开这场，标记到场或爽约。</text>
-    <view
-      class="pending"
-      wx:for="{{pending}}"
-      wx:key="id"
-      data-id="{{item.id}}"
-      bindtap="openDetail"
-    >
+    <text class="panel-title">待完成</text>
+    <text class="hint">点开车次，在底部点完成。车上的人会记入已打本单，这场从这里消失。</text>
+    <view class="pending" wx:for="{{pending}}" wx:key="id" data-id="{{item.id}}" bindtap="openDetail">
       <text class="pending-name">{{item.scriptName}}</text>
       <text class="pending-meta">{{item.timeText}}</text>
     </view>
+  </view>
+
+  <view class="panel">
+    <text class="panel-title">已打本单</text>
+    <view wx:if="{{played.length === 0}}" class="hint">还没有结算过的剧本。</view>
+    <text wx:for="{{played}}" wx:key="*this" class="played">{{item}}</text>
   </view>
 
   <view class="panel" wx:if="{{user.role === 'admin'}}">

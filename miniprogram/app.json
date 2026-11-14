@@ -3,10 +3,13 @@
     "pages/login/login",
     "pages/index/index",
     "pages/scripts/scripts",
+    "pages/messages/messages",
     "pages/me/me",
     "pages/auth/webview",
     "pages/session/create/create",
-    "pages/session/detail/detail"
+    "pages/session/detail/detail",
+    "pages/chat/private/private",
+    "pages/chat/group/group"
   ],
   "tabBar": {
     "color": "#9aa3b2",
@@ -26,6 +29,12 @@
         "text": "剧本",
         "iconPath": "assets/tab/script.png",
         "selectedIconPath": "assets/tab/script-on.png"
+      },
+      {
+        "pagePath": "pages/messages/messages",
+        "text": "消息",
+        "iconPath": "assets/tab/message.png",
+        "selectedIconPath": "assets/tab/message-on.png"
       },
       {
         "pagePath": "pages/me/me",

@@ -1,0 +1,54 @@
+<view class="page">
+  <text class="title">消息</text>
+
+  <view wx:if="{{loading}}" class="hint">正在加载</view>
+
+  <view wx:elif="{{!user}}" class="empty">
+    <text class="empty-title">登录后才能看消息</text>
+    <button class="primary block" bindtap="goLogin">去登录</button>
+  </view>
+
+  <block wx:else>
+    <view class="card form">
+      <text class="label">按学号私聊</text>
+      <view class="start-row">
+        <input class="input" placeholder="对方学号" value="{{studentId}}" bindinput="onStudentId" />
+        <button class="primary slim start" bindtap="openPrivate">发起</button>
+      </view>
+    </view>
+
+    <text class="section">车次群</text>
+    <view wx:if="{{groups.length === 0}}" class="hint">发车或上车之后，群会出现在这里。</view>
+    <view
+      wx:for="{{groups}}"
+      wx:key="sessionId"
+      class="card thread"
+      data-id="{{item.sessionId}}"
+      bindtap="openGroup"
+    >
+      <view class="thread-top">
+        <text class="thread-title">{{item.title}}</text>
+        <text class="muted">{{item.kindText}}</text>
+      </view>
+      <text class="thread-preview">{{item.lastText || '还没有消息'}}</text>
+      <text class="thread-time" wx:if="{{item.timeText}}">{{item.timeText}}</text>
+    </view>
+
+    <text class="section">私聊</text>
+    <view wx:if="{{privates.length === 0}}" class="hint">输入学号，就能开始私聊。</view>
+    <view
+      wx:for="{{privates}}"
+      wx:key="peerUid"
+      class="card thread"
+      data-id="{{item.peerStudentId}}"
+      bindtap="openThread"
+    >
+      <view class="thread-top">
+        <text class="thread-title">{{item.peerName}}</text>
+        <text class="muted">{{item.peerStudentId}}</text>
+      </view>
+      <text class="thread-preview">{{item.lastText}}</text>
+      <text class="thread-time" wx:if="{{item.timeText}}">{{item.timeText}}</text>
+    </view>
+  </block>
+</view>

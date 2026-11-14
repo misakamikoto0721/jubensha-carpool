@@ -231,6 +231,45 @@ test('a car leaves the board at start time and can still be marked', () => {
   assert.equal(domain.needsMark(session({ status: 'drawn', start_time: future }), future), true)
 })
 
+test('session chat follows the roster and private chat is two different people', () => {
+  const dm = player({ uid: 'PB0001', role: 'dm' })
+  const rider = player({ uid: 'PB0002' })
+  const waiting = player({ uid: 'PB0003' })
+  const weekly = session({
+    kind: 'weekly',
+    dm_uid: 'PB0001',
+    member_uids: [],
+    applicant_uids: ['PB0003'],
+    draw_status: 'pending'
+  })
+  assert.equal(domain.canAccessSessionChat(dm, weekly), true)
+  assert.equal(domain.canAccessSessionChat(waiting, weekly), true)
+  assert.equal(domain.canAccessSessionChat(rider, weekly), false)
+
+  const drawn = session({
+    kind: 'weekly',
+    dm_uid: 'PB0001',
+    status: 'drawn',
+    draw_status: 'done',
+    member_uids: ['PB0002'],
+    applicant_uids: [],
+    missed_uids: ['PB0003']
+  })
+  assert.equal(domain.canAccessSessionChat(rider, drawn), true)
+  assert.equal(domain.canAccessSessionChat(waiting, drawn), false)
+  assert.equal(domain.canAccessSessionChat(player({ uid: 'PB0009' }), session({
+    kind: 'private',
+    dm_uid: 'PB0001',
+    member_uids: ['PB0002']
+  })), false)
+
+  assert.equal(domain.privateThreadId('PB0002', 'PB0001'), 'PB0001_PB0002')
+  assert.equal(domain.decidePrivatePeer(dm, rider).ok, true)
+  assert.equal(domain.decidePrivatePeer(dm, dm).reason, 'self_chat')
+  assert.equal(domain.validateMessageText('  你好 ').text, '你好')
+  assert.equal(domain.validateMessageText(' ').reason, 'empty_message')
+})
+
 test('only the hosting DM or an admin can mark attendance', () => {
   const car = session()
   assert.equal(domain.canManageSession(player({ uid: 'PB0001', role: 'dm' }), car), true)
@@ -246,6 +285,26 @@ test('only an admin can add or remove a DM', () => {
   assert.equal(domain.decideRoleChange(member, member, 'dm').reason, 'forbidden')
   assert.equal(domain.decideRoleChange(admin, player({ role: 'admin' }), 'dm').reason, 'forbidden')
   assert.equal(domain.decideRoleChange(admin, member, 'admin').reason, 'invalid_role')
+})
+
+test('a nickname and avatar stay on the same user', () => {
+  assert.equal(domain.displayName({ name: '张三', nickname: ' 小张 ' }), '小张')
+  assert.equal(domain.displayName({ name: '张三' }), '张三')
+  assert.equal(domain.validateNickname(' ').reason, 'invalid_nickname')
+  assert.equal(domain.validateNickname('小张').nickname, '小张')
+  assert.equal(domain.validateAvatarFileId('https://example.com/a.png', 'PB0001').reason, 'invalid_avatar')
+  assert.equal(domain.validateAvatarFileId('cloud://dev/avatars/PB0002-1.jpg', 'PB0001').reason, 'invalid_avatar')
+  const avatar = domain.validateAvatarFileId('cloud://dev/avatars/PB0001-1.jpg', 'PB0001')
+  assert.equal(avatar.avatarFileId, 'cloud://dev/avatars/PB0001-1.jpg')
+})
+
+test('completing a car records the script once for the people who played', () => {
+  const user = { played_scripts: ['年轮'] }
+  assert.equal(domain.hasPlayed(user, '年轮'), true)
+  assert.equal(domain.hasPlayed(user, '窗边'), false)
+  assert.deepEqual(domain.withPlayedScript(user, '年轮'), ['年轮'])
+  assert.deepEqual(domain.withPlayedScript(user, '窗边'), ['年轮', '窗边'])
+  assert.deepEqual(domain.withPlayedScript({}, '窗边'), ['窗边'])
 })
 
 test('attendance must cover exactly the people on the car', () => {

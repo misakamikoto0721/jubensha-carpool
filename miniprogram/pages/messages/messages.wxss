@@ -1,0 +1,58 @@
+.form {
+  margin-top: 28rpx;
+}
+
+.start-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.start-row .input {
+  flex: 1;
+}
+
+.start {
+  margin-top: 0;
+}
+
+.section {
+  display: block;
+  margin-top: 36rpx;
+  color: #6d645b;
+  font-size: 26rpx;
+}
+
+.thread {
+  margin-top: 16rpx;
+}
+
+.thread-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.thread-title {
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.thread-preview,
+.thread-time {
+  display: block;
+  margin-top: 8rpx;
+  color: #8a94a6;
+  font-size: 26rpx;
+}
+
+.empty {
+  margin-top: 48rpx;
+}
+
+.empty-title {
+  display: block;
+  font-size: 34rpx;
+  font-weight: 600;
+}

@@ -14,10 +14,18 @@ const handlers = {
   drawSession: require('./handlers/drawSession'),
   pullMember: require('./handlers/pullMember'),
   cancelJoin: require('./handlers/cancelJoin'),
+  completeSession: require('./handlers/completeSession'),
   markAttendance: require('./handlers/markAttendance'),
   getSession: require('./handlers/getSession'),
   listSessions: require('./handlers/listSessions'),
   listPendingMarks: require('./handlers/listPendingMarks'),
+  listPrivateChats: require('./handlers/listPrivateChats'),
+  listPrivateMessages: require('./handlers/listPrivateMessages'),
+  sendPrivateMessage: require('./handlers/sendPrivateMessage'),
+  listSessionChats: require('./handlers/listSessionChats'),
+  listSessionMessages: require('./handlers/listSessionMessages'),
+  sendSessionMessage: require('./handlers/sendSessionMessage'),
+  updateProfile: require('./handlers/updateProfile'),
   setRole: require('./handlers/setRole')
 }
 

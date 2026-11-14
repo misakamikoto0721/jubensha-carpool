@@ -47,11 +47,11 @@ module.exports = async function getSession(event, cloud) {
     if (mine) signupByUid[user.uid] = mine
   }
 
-  const members = memberIds.map((uid) => personOnList(uid, userMap, signupByUid, 'joined'))
+  const members = memberIds.map((uid) => personOnList(uid, userMap, signupByUid, 'joined', session.script_name))
     .filter((member) => member.status !== 'dropped' && member.status !== 'missed')
-  const applicants = applicantIds.map((uid) => personOnList(uid, userMap, signupByUid, 'waiting'))
+  const applicants = applicantIds.map((uid) => personOnList(uid, userMap, signupByUid, 'waiting', session.script_name))
     .filter((member) => member.status === 'waiting')
-  const missed = missedIds.map((uid) => personOnList(uid, userMap, signupByUid, 'missed'))
+  const missed = missedIds.map((uid) => personOnList(uid, userMap, signupByUid, 'missed', session.script_name))
 
   const uid = user ? user.uid : ''
   const onCar = !!(uid && memberIds.indexOf(uid) >= 0)
@@ -75,7 +75,9 @@ module.exports = async function getSession(event, cloud) {
         (waiting && !frozen) || (onCar && domain.sessionKind(session) !== 'weekly')
       ),
       canMark: manageable,
+      canComplete: manageable && domain.needsMark(session, now),
       canPull: manageable && domain.sessionKind(session) === 'private' && session.start_time > now,
+      canChat: domain.canAccessSessionChat(user, session),
       mySeat: onCar ? 'joined' : (waiting ? 'waiting' : (missedSeat ? 'missed' : '')),
       joinBlockReason: onCar || (waiting && !frozen) || decision.ok
         ? ''
@@ -95,7 +97,7 @@ async function readSignup(db, id) {
   }
 }
 
-function personOnList(uid, userMap, signupByUid, fallback) {
+function personOnList(uid, userMap, signupByUid, fallback, scriptName) {
   const person = userMap[uid]
   const signup = signupByUid[uid]
   let status = signup ? signup.status : fallback
@@ -106,6 +108,7 @@ function personOnList(uid, userMap, signupByUid, fallback) {
     uid: uid,
     name: person ? person.name : uid,
     studentId: person ? (person.student_id || uid) : uid,
-    status: status
+    status: status,
+    replay: domain.hasPlayed(person, scriptName)
   }
 }

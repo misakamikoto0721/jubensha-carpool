@@ -34,10 +34,12 @@ module.exports = async function joinSession(event, cloud) {
           placement: onCar ? 'joined' : 'waiting',
           joinedCount: session.joined_count || members.length,
           applicantCount: session.applicant_count || applicants.length,
-          capacity: session.capacity
+          capacity: session.capacity,
+          replay: domain.hasPlayed(userSnap.data, session.script_name)
         }
       }
       const decision = errors.fromResult(domain.decideJoin({ user: userSnap.data, session: session, now: now }))
+      const replay = domain.hasPlayed(userSnap.data, session.script_name)
       if (decision.placement === 'waiting') {
         if (applicants.indexOf(uid) < 0) applicants.push(uid)
         await writeSignup(signupRef, signup, sessionId, uid, 'waiting', now)
@@ -48,7 +50,7 @@ module.exports = async function joinSession(event, cloud) {
             status: 'open'
           }
         })
-        return { ok: true, placement: 'waiting', applicantCount: applicants.length, capacity: session.capacity }
+        return { ok: true, placement: 'waiting', applicantCount: applicants.length, capacity: session.capacity, replay: replay }
       }
       if (members.indexOf(uid) < 0) members.push(uid)
       const joinedCount = members.length
@@ -60,7 +62,7 @@ module.exports = async function joinSession(event, cloud) {
           status: domain.nextSeatStatus(session, joinedCount)
         }
       })
-      return { ok: true, placement: 'joined', joinedCount: joinedCount, capacity: session.capacity }
+      return { ok: true, placement: 'joined', joinedCount: joinedCount, capacity: session.capacity, replay: replay }
     })
   } catch (err) {
     const response = errors.toResponse(err)

@@ -58,14 +58,20 @@ module.exports = async function markAttendance(event, cloud) {
           errors.raise('invalid_attendance', '有成员不在车上，请刷新后再标记')
         }
         await signupRef.update({ data: { status: item.status } })
-        if (item.status !== 'no_show') continue
-
         const user = userMap[item.uid]
         if (!user) errors.raise('missing_user', '找不到学号 ' + item.uid)
         const freshSnap = await transaction.collection('users').doc(user._id).get()
-        const next = domain.applyNoShow(freshSnap.data, now, config)
-        await transaction.collection('users').doc(user._id).update({ data: next })
-        if (next.credit_status === 'restricted') banned.push(item.uid)
+        const fresh = freshSnap.data
+        if (!fresh) errors.raise('missing_user', '找不到学号 ' + item.uid)
+        if (item.status === 'no_show') {
+          const next = domain.applyNoShow(fresh, now, config)
+          await transaction.collection('users').doc(user._id).update({ data: next })
+          if (next.credit_status === 'restricted') banned.push(item.uid)
+          continue
+        }
+        await transaction.collection('users').doc(user._id).update({
+          data: { played_scripts: domain.withPlayedScript(fresh, session.script_name) }
+        })
       }
 
       await transaction.collection('sessions').doc(sessionId).update({

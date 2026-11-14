@@ -31,21 +31,22 @@
     <view class="section" wx:if="{{session.kind === 'weekly' && session.drawStatus !== 'done'}}">
       <text class="section-title">等待抽签</text>
       <view wx:if="{{applicants.length === 0}}" class="hint tight">还没有人报名</view>
-      <view wx:for="{{applicants}}" wx:key="uid" class="member">
+      <view wx:for="{{applicants}}" wx:key="uid" class="member {{item.replay ? 'replay' : ''}}">
         <text>{{item.name}}</text>
-        <text class="muted">{{item.statusText}}</text>
+        <text class="muted">{{item.replay ? '二刷 · ' : ''}}{{item.statusText}}</text>
       </view>
     </view>
 
     <view class="section">
       <text class="section-title">车上的人</text>
       <view wx:if="{{members.length === 0}}" class="hint tight">{{session.kind === 'weekly' ? '抽签之后才会出现在这里' : '还没有人上车'}}</view>
-      <view wx:for="{{members}}" wx:key="uid" class="member">
+      <view wx:for="{{members}}" wx:key="uid" class="member {{item.replay ? 'replay' : ''}}">
         <text>{{item.name}}</text>
-        <text class="muted">{{item.statusText}}</text>
+        <text class="muted">{{item.replay ? '二刷 · ' : ''}}{{item.statusText}}</text>
       </view>
     </view>
 
+    <text class="link chat-link" wx:if="{{canChat}}" bindtap="openGroup">本场群聊</text>
     <text class="link" bindtap="copyLibrary">复制研讨室预约链接</text>
 
     <view class="section card" wx:if="{{canPull}}">
@@ -82,7 +83,8 @@
 
   <view class="dock" wx:if="{{session}}">
     <button class="share" open-type="share">分享</button>
-    <button wx:if="{{needBind}}" class="primary" bindtap="goLogin">登录后上车</button>
+    <button wx:if="{{canComplete}}" class="complete" bindtap="completeSession">完成</button>
+    <button wx:elif="{{needBind}}" class="primary" bindtap="goLogin">登录后上车</button>
     <button wx:elif="{{canJoin}}" class="primary" bindtap="join">{{session.kind === 'weekly' ? '报名' : '上车'}}</button>
     <button wx:elif="{{canCancel}}" class="ghost danger" bindtap="cancelJoin">{{mySeat === 'waiting' ? '取消报名' : '取消上车'}}</button>
     <view wx:else class="dock-note">{{joinBlockReason}}</view>
