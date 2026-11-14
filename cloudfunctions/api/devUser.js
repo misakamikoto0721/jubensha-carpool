@@ -1,5 +1,5 @@
-// 临时：统一认证接通后，删除本文件、handlers/devLogin.js，以及登录页的「临时账号」。
-// 改下面的 account 后重新部署云函数，再在登录页点一次，当前微信号就变成这个人。
+// 临时：统一认证接通后，删除本文件、handlers/devLogin.js，以及登录页的「临时登录」。
+// account 是第一个点「临时登录」的微信号。之后每个微信号各有一条 users，再点还是同一条。
 
 const domain = require('./domain')
 
@@ -43,7 +43,45 @@ function readAccount(source) {
   }
 }
 
+function assignDevLogin(input) {
+  const openid = input.openid
+  const configuredId = input.configuredId
+  const identity = input.identity || null
+  const holders = input.holders || []
+  if (identity && identity.uid && identity.uid !== configuredId) {
+    return { action: 'keep', uid: identity.uid }
+  }
+  const others = holders.filter((row) => row.openid && row.openid !== openid)
+  if (others.length === 0) return { action: 'configured' }
+  const earliestOther = others.reduce((best, row) => {
+    if (!best || earlierHolder(row, best)) return row
+    return best
+  }, null)
+  const mine = holders.filter((row) => row.openid === openid)[0] || (identity && identity.openid === openid ? identity : null)
+  if (mine && earlierHolder(mine, earliestOther)) return { action: 'configured' }
+  return { action: 'allocate' }
+}
+
+function earlierHolder(left, right) {
+  const leftAt = Number(left.bound_at || 0)
+  const rightAt = Number(right.bound_at || 0)
+  if (leftAt !== rightAt) return leftAt < rightAt
+  return String(left.openid) < String(right.openid)
+}
+
+function guestAccount(index) {
+  const id = 'PB' + String(index).padStart(6, '0')
+  return {
+    id: id,
+    studentId: id,
+    name: '测试' + index,
+    role: 'player'
+  }
+}
+
 module.exports = {
   enabled: config.enabled,
-  readAccount: readAccount
+  readAccount: readAccount,
+  assignDevLogin: assignDevLogin,
+  guestAccount: guestAccount
 }

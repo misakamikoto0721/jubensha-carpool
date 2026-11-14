@@ -90,5 +90,6 @@ function decorateMember(member) {
 module.exports = {
   decorateUser: decorateUser,
   decorateSession: decorateSession,
-  decorateMember: decorateMember
+  decorateMember: decorateMember,
+  timeRange: timeRange
 }

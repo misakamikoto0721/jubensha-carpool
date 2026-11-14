@@ -185,6 +185,23 @@ function canAccessSessionChat(user, session) {
   return applicants.indexOf(user.uid) >= 0
 }
 
+function sessionChatRoster(session) {
+  if (!session) return []
+  const rows = []
+  const seen = {}
+  const add = (uid, seat) => {
+    if (!uid || seen[uid]) return
+    seen[uid] = true
+    rows.push({ uid: uid, seat: seat })
+  }
+  add(session.dm_uid, 'dm')
+  ;(session.member_uids || []).forEach((uid) => add(uid, 'member'))
+  if (weeklyDrawState(session) !== 'done') {
+    ;(session.applicant_uids || []).forEach((uid) => add(uid, 'applicant'))
+  }
+  return rows
+}
+
 function validateMessageText(text) {
   const value = String(text || '').trim()
   if (!value) return fail('empty_message', '请输入内容')
@@ -377,6 +394,7 @@ module.exports = {
   weeklySignupFrozen: weeklySignupFrozen,
   decideDraw: decideDraw,
   canAccessSessionChat: canAccessSessionChat,
+  sessionChatRoster: sessionChatRoster,
   validateMessageText: validateMessageText,
   privateThreadId: privateThreadId,
   decidePrivatePeer: decidePrivatePeer,

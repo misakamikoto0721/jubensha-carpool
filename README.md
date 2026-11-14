@@ -4,13 +4,13 @@
 
 身份来自科大统一身份认证。登录成功后，学工号写入云端用户记录。小程序不让用户自己填学号来注册。
 
-当前阶段：统一认证的页面和接口已经留好，学校的 `client_id` / `client_secret` 还没下来，所以登录按钮会提示尚未配置。产品页面按「登录页 → 三个分页」来用，不要再改回手填学号的主流程。
+当前阶段：统一认证的页面和接口已经留好，学校的 `client_id` / `client_secret` 还没下来，所以登录按钮会提示尚未配置。产品页面按「登录页 → 底栏四页」来用，不要再改回手填学号的主流程。
 
 后续 Agent 在审核代码或继续开发之前，必须先读 [Agent.md](Agent.md) 并遵守。
 
 ## 现在的页面
 
-打开小程序先进 `pages/login/login`。正式按钮是「统一身份认证登录」，去接科大官方登录页，那个页面不由本项目绘制。统一认证接通前，同一页有「临时登录」，用 `devUser.js` 里的账号进入底栏。接通后删掉它。已经登录过的微信会直接进入底栏。
+打开小程序先进 `pages/login/login`。正式按钮是「统一身份认证登录」，去接科大官方登录页，那个页面不由本项目绘制。统一认证接通前，同一页有「临时登录」。最早点的微信号用 `devUser.js` 里的账号，之后每个微信号各有一个临时账号。接通后删掉它。已经登录过的微信会直接进入底栏。
 
 | 底栏 | 路径 | 作用 |
 |---|---|---|
@@ -19,7 +19,7 @@
 | 消息 | `pages/messages/messages` | 按学号私聊，以及自己能进的车次群 |
 | 我的 | `pages/me/me` | 姓名、学号、身份、爽约、已打本单。可以改昵称和头像。DM 从这里点进已开车次。管理员可把别人加入 DM。登出回到登录页 |
 
-发车 `pages/session/create/create`、车次详情 `pages/session/detail/detail`、私聊和车次群从底栏里打开，不占底栏。研讨室不在小程序里预约，详情页复制 `http://ic.lib.ustc.edu.cn/`。车次群在发车时就有，上车或周常报名后自动进入。
+发车 `pages/session/create/create`、车次详情 `pages/session/detail/detail`、私聊和车次群从底栏里打开，不占底栏。研讨室不在小程序里预约，详情页复制 `http://ic.lib.ustc.edu.cn/`。车次群在发车时就有，上车或周常报名后自动进入，取消上车或没抽中后自动离开。群标题显示剧本名、时间和人数。右侧成员栏可折叠，点头像看资料，再从资料里发私信。
 
 ## 账号存在哪
 
@@ -65,12 +65,13 @@ wx.cloud.callFunction({ name: 'api', data: { action, ... } })
 | `listPrivateMessages` | 打开和某个学号的私聊 |
 | `sendPrivateMessage` | 按学号发私聊。发送者是当前登录身份 |
 | `listSessionChats` | 消息页列出自己能进的车次群 |
-| `listSessionMessages` | 打开本场群 |
+| `listSessionMessages` | 打开本场群。返回剧本名、时间、在群人数和消息 |
+| `listSessionMembers` | 车次群右侧成员栏，以及点头像时的资料。只列出还在群里的人 |
 | `sendSessionMessage` | 往本场群发一条。不在群里就拒绝 |
 | `updateProfile` | 本人改自己的昵称或头像。不改学号和认证姓名 |
 | `setRole` | 仅管理员。`role` 只能是 `dm` 或 `player` |
 
-临时入口：`bindUid`（自己填学号，登录页不展示）、`devLogin`（登录页「临时登录」，读 `cloudfunctions/api/devUser.js`）。统一认证接通后删掉这两个 action、`devUser.js`、登录页上的临时按钮和对应测试。对外预览前把 `devUser.js` 的 `enabled` 改成 `false`。
+临时入口：`bindUid`（自己填学号，登录页不展示）、`devLogin`（登录页「临时登录」。配置里的账号给第一个微信号，其余微信号各建一个玩家账号）。统一认证接通后删掉这两个 action、`devUser.js`、登录页上的临时按钮和对应测试。对外预览前把 `devUser.js` 的 `enabled` 改成 `false`。
 
 统一认证环境变量只放在云函数上，不写进仓库：`USTC_CLIENT_ID`、`USTC_CLIENT_SECRET`、`USTC_REDIRECT_URI`。三个都有时才访问学校接口。
 

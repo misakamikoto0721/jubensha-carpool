@@ -24,6 +24,9 @@ module.exports = async function listSessionMessages(event, cloud) {
     ok: true,
     sessionId: sessionId,
     title: session.script_name,
+    startTime: session.start_time,
+    endTime: session.end_time || null,
+    memberCount: domain.sessionChatRoster(session).length,
     messages: ordered.map((row) => messages.presentMessage(row, userMap, loaded.user.uid))
   }
 }

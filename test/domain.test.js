@@ -262,6 +262,13 @@ test('session chat follows the roster and private chat is two different people',
     dm_uid: 'PB0001',
     member_uids: ['PB0002']
   })), false)
+  assert.deepEqual(domain.sessionChatRoster(weekly).map((row) => row.uid + ':' + row.seat), ['PB0001:dm', 'PB0003:applicant'])
+  assert.deepEqual(domain.sessionChatRoster(drawn).map((row) => row.uid), ['PB0001', 'PB0002'])
+  assert.deepEqual(domain.sessionChatRoster(session({
+    dm_uid: 'PB0001',
+    member_uids: ['PB0001', 'PB0002'],
+    missed_uids: ['PB0009']
+  })).map((row) => row.uid), ['PB0001', 'PB0002'])
 
   assert.equal(domain.privateThreadId('PB0002', 'PB0001'), 'PB0001_PB0002')
   assert.equal(domain.decidePrivatePeer(dm, rider).ok, true)

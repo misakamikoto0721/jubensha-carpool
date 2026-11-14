@@ -17,6 +17,40 @@ module.exports = async function devLogin(event, cloud) {
   await users.ensureCollection(db, 'users')
   await users.ensureCollection(db, 'auth_identities')
 
+  const identity = await users.findIdentity(db, openid)
+  const holders = await users.safeList(
+    db.collection('auth_identities').where({ uid: account.id }).limit(100).get()
+  )
+  const decision = devUser.assignDevLogin({
+    openid: openid,
+    configuredId: account.id,
+    identity: identity,
+    holders: holders
+  })
+
+  if (decision.action === 'keep') {
+    const existing = await users.findUserByUid(db, decision.uid)
+    if (existing) return { ok: true, bound: true, devLogin: true, user: users.presentUser(existing) }
+  }
+
+  const chosen = decision.action === 'configured' ? account : await firstFreeGuest(db)
+  if (!chosen) return { ok: false, reason: 'dev_login_full', message: '临时账号已经发完' }
+
+  const user = await upsertAccount(db, chosen, now, decision.action === 'configured')
+  await bindOpenId(db, identity, openid, user.uid, provider, now)
+  return { ok: true, bound: true, devLogin: true, user: users.presentUser(user) }
+}
+
+async function firstFreeGuest(db) {
+  for (let index = 2; index < 200; index += 1) {
+    const guest = devUser.guestAccount(index)
+    const existing = await users.findUserByUid(db, guest.id)
+    if (!existing) return guest
+  }
+  return null
+}
+
+async function upsertAccount(db, account, now, refreshRole) {
   let user = await users.findUserByUid(db, account.id)
   if (!user) {
     const added = await db.collection('users').add({
@@ -32,7 +66,7 @@ module.exports = async function devLogin(event, cloud) {
         created_at: now
       }
     })
-    user = {
+    return {
       _id: added._id,
       uid: account.id,
       student_id: account.studentId,
@@ -42,7 +76,8 @@ module.exports = async function devLogin(event, cloud) {
       ban_until: null,
       no_show_count: 0
     }
-  } else {
+  }
+  if (refreshRole) {
     await db.collection('users').doc(user._id).update({
       data: {
         student_id: account.studentId,
@@ -54,27 +89,22 @@ module.exports = async function devLogin(event, cloud) {
     user.name = account.name
     user.role = account.role
   }
+  return user
+}
 
-  const identity = await users.findIdentity(db, openid)
+async function bindOpenId(db, identity, openid, uid, provider, now) {
   if (identity) {
     await db.collection('auth_identities').doc(identity._id).update({
-      data: { uid: account.id, provider: provider, bound_at: now }
+      data: { uid: uid, provider: provider, bound_at: identity.bound_at || now }
     })
-  } else {
-    await db.collection('auth_identities').add({
-      data: {
-        provider: provider,
-        openid: openid,
-        uid: account.id,
-        bound_at: now
-      }
-    })
+    return
   }
-
-  return {
-    ok: true,
-    bound: true,
-    devLogin: true,
-    user: users.presentUser(user)
-  }
+  await db.collection('auth_identities').add({
+    data: {
+      provider: provider,
+      openid: openid,
+      uid: uid,
+      bound_at: now
+    }
+  })
 }

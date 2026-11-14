@@ -1,9 +1,17 @@
 <view class="room">
+  <view class="head" style="padding-top: {{statusBar}}px; height: {{headHeight}}px; padding-right: {{capsuleGap}}px;">
+    <view class="back" bindtap="goBack">〈</view>
+    <view class="head-copy">
+      <text class="head-title">{{title}}</text>
+      <text class="head-meta">{{timeText}}{{timeText && memberCount ? ' · ' : ''}}{{memberCount ? memberCount + '人' : ''}}</text>
+    </view>
+  </view>
+
   <scroll-view class="log" scroll-y scroll-into-view="{{anchor}}" scroll-with-animation>
     <view wx:if="{{failed}}" class="hint">{{failed}}</view>
     <view wx:elif="{{messages.length === 0}}" class="hint">这个群还没有人说话。</view>
     <view wx:for="{{messages}}" wx:key="id" class="row {{item.mine ? 'mine' : ''}}">
-      <view class="face">
+      <view class="face" data-uid="{{item.fromUid}}" catchtap="openProfile">
         <image wx:if="{{item.avatar}}" class="face-img" src="{{item.avatar}}" mode="aspectFill" />
         <view wx:else class="face-fallback">{{item.initial}}</view>
       </view>
@@ -14,8 +22,48 @@
     </view>
     <view id="bottom"></view>
   </scroll-view>
+
   <view class="composer">
     <input class="input" placeholder="在本场群里说" value="{{draft}}" bindinput="onDraft" confirm-type="send" bindconfirm="send" />
     <button class="primary send" bindtap="send">发送</button>
+  </view>
+
+  <view class="drawer-mask" wx:if="{{drawer}}" bindtap="closeDrawer"></view>
+  <view class="drawer {{drawer ? 'open' : ''}}" style="top: {{headHeight}}px;">
+    <scroll-view class="drawer-log" scroll-y>
+      <view
+        class="mate"
+        wx:for="{{members}}"
+        wx:key="uid"
+        data-uid="{{item.uid}}"
+        bindtap="openProfile"
+      >
+        <view class="face">
+          <image wx:if="{{item.avatar}}" class="face-img" src="{{item.avatar}}" mode="aspectFill" />
+          <view wx:else class="face-fallback">{{item.initial}}</view>
+        </view>
+        <view class="mate-copy">
+          <text class="mate-name">{{item.nickname}}</text>
+          <text class="mate-seat">{{item.seatText}}</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+  <view class="handle {{drawer ? 'aside' : ''}}" bindtap="toggleDrawer">{{drawer ? '›' : '‹'}}</view>
+
+  <view class="sheet-mask" wx:if="{{profile}}" bindtap="closeProfile">
+    <view class="sheet" catchtap="hold">
+      <view class="sheet-who">
+        <view class="sheet-avatar">
+          <image wx:if="{{profile.avatar}}" class="sheet-img" src="{{profile.avatar}}" mode="aspectFill" />
+          <text wx:else>{{profile.initial}}</text>
+        </view>
+        <view class="sheet-copy">
+          <text class="sheet-line">{{profile.nickname}} | {{profile.studentId}}</text>
+          <text class="sheet-sub">{{profile.seatText}}</text>
+        </view>
+      </view>
+      <button wx:if="{{!profile.mine}}" class="primary block" data-student-id="{{profile.studentId}}" bindtap="openPrivate">发私信</button>
+    </view>
   </view>
 </view>

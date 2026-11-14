@@ -28,6 +28,42 @@ test('dev login stays closed when the config is disabled', () => {
   assert.equal(result.reason, 'dev_login_disabled')
 })
 
+test('each wechat keeps its own temp account after the first one is taken', () => {
+  const first = devUser.assignDevLogin({
+    openid: 'wx-a',
+    configuredId: 'PB000001',
+    identity: { openid: 'wx-a', uid: 'PB000001', bound_at: 1 },
+    holders: [
+      { openid: 'wx-a', uid: 'PB000001', bound_at: 1 },
+      { openid: 'wx-b', uid: 'PB000001', bound_at: 2 }
+    ]
+  })
+  const second = devUser.assignDevLogin({
+    openid: 'wx-b',
+    configuredId: 'PB000001',
+    identity: { openid: 'wx-b', uid: 'PB000001', bound_at: 2 },
+    holders: [
+      { openid: 'wx-a', uid: 'PB000001', bound_at: 1 },
+      { openid: 'wx-b', uid: 'PB000001', bound_at: 2 }
+    ]
+  })
+  const again = devUser.assignDevLogin({
+    openid: 'wx-b',
+    configuredId: 'PB000001',
+    identity: { openid: 'wx-b', uid: 'PB000002', bound_at: 3 },
+    holders: [{ openid: 'wx-a', uid: 'PB000001', bound_at: 1 }]
+  })
+  assert.equal(first.action, 'configured')
+  assert.equal(second.action, 'allocate')
+  assert.deepEqual(again, { action: 'keep', uid: 'PB000002' })
+  assert.deepEqual(devUser.guestAccount(2), {
+    id: 'PB000002',
+    studentId: 'PB000002',
+    name: '测试2',
+    role: 'player'
+  })
+})
+
 test('dev account rejects an unknown role', () => {
   const result = devUser.readAccount({
     enabled: true,

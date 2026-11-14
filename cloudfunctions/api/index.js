@@ -24,6 +24,7 @@ const handlers = {
   sendPrivateMessage: require('./handlers/sendPrivateMessage'),
   listSessionChats: require('./handlers/listSessionChats'),
   listSessionMessages: require('./handlers/listSessionMessages'),
+  listSessionMembers: require('./handlers/listSessionMembers'),
   sendSessionMessage: require('./handlers/sendSessionMessage'),
   updateProfile: require('./handlers/updateProfile'),
   setRole: require('./handlers/setRole')

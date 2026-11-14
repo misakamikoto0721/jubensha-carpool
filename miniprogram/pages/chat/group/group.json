@@ -1,5 +1,5 @@
 {
-  "navigationBarTitleText": "车次群",
-  "enablePullDownRefresh": true,
-  "backgroundTextStyle": "dark"
+  "navigationStyle": "custom",
+  "disableScroll": true,
+  "backgroundColor": "#1a56b0"
 }

@@ -47,6 +47,7 @@ function presentMessage(doc, userMap, mineUid) {
     nickname: nickname,
     initial: nickname ? String(nickname).slice(0, 1) : '?',
     avatar: person && person.avatar_file_id ? person.avatar_file_id : '',
+    studentId: person ? (person.student_id || doc.from_uid) : doc.from_uid,
     text: doc.text,
     createdAt: doc.created_at,
     mine: doc.from_uid === mineUid
